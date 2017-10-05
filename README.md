@@ -1,0 +1,2 @@
+# diplomarbeitsarchiv
+Diplomarbeit: Elektronische Diplomarbeitsarchivierung 
