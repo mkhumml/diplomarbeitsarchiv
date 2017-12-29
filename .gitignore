@@ -1,0 +1,5 @@
+
+.DS_Store
+.idea/inspectionProfiles/
+.idea/workspace.xml
+/styles/floatz-2.0.0.alpha/**/*.min.css
