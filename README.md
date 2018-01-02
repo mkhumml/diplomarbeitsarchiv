@@ -8,7 +8,9 @@
 https://changelog.com/posts/install-node-js-with-homebrew-on-os-x
 
 ## Install npm
+``` bash
 npm install npm
+```
 
 ## Install Vue.js CLI
 https://github.com/vuejs/vue-cli
