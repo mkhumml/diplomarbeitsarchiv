@@ -1,2 +1,5 @@
 <?php
-echo "Hello World 2";
+$foo = file_get_contents("php://input");
+$person = json_decode($foo, true);
+echo $person["firstName"];
+?>

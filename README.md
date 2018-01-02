@@ -1,19 +1,18 @@
-# diplomarbeitsarchiv
-Diplomarbeit: Elektronische Diplomarbeitsarchivierung 
+# vuecli-n1
 
-## Links
+> A Vue.js project
 
-### Ajax for Vue.js
-https://github.com/axios/axios
-https://alligator.io/vuejs/rest-api-axios/
+## Build Setup
 
-### Integrate PHP Webstorm with MAMP
-https://dillieodigital.wordpress.com/2015/03/10/quick-tip-enabling-xdebug-in-mamp-for-osx/
-https://confluence.jetbrains.com/display/PhpStorm/Installing+and+Configuring+MAMP+with+PhpStorm+IDE
-https://www.jetbrains.com/phpstorm/marklets/
+``` bash
+# install dependencies
+npm install
 
-### Creating PHP REST APIs
-http://flightphp.com/
+# serve with hot reload at localhost:8080
+npm run dev
 
-### Chrome plugin for testing REST APIs
-https://www.getpostman.com/apps
+# build for production with minification
+npm run build
+```
+
+For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
