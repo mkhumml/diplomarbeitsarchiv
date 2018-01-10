@@ -14,7 +14,7 @@ new Vue({
     methods: {
 
         buttonClicked: function () {
-            axios.post('http://localhost:63342/diplomarbeitsarchiv/service.php', {
+            axios.post('service.php', {
                     firstName: this.firstName,
                     lastName: this.lastName,
                     age: this.age

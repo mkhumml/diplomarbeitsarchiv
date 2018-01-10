@@ -1922,3 +1922,102 @@ html {
     padding: 0;
   }
 }
+.flz-form input[type=text],
+.flz-form input[type=password],
+.flz-form select,
+.flz-form textarea {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  border: 1px solid #aaa;
+  display: block;
+  height: 2rem;
+  width: 100%;
+}
+.flz-form label {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: block;
+  padding: 0 0 0.5rem 0;
+  width: 100%;
+}
+.flz-form input[type=radio] + label,
+.flz-form input[type=checkbox] + label {
+  display: inline-block;
+  padding: 0 0.5rem 0 0;
+  width: auto;
+}
+.flz-form textarea {
+  height: auto;
+}
+fieldset {
+  border: 1px solid #aaa;
+}
+legend {
+  padding: 0 0.5rem;
+}
+/*--------------------Classes--------------------------------*/
+.article {
+  margin: 0 auto;
+  max-width: 75em;
+  position: relative;
+}
+.content {
+  background-color: #FFF;
+  border-bottom: 1px solid black;
+}
+.contentArticle h2 {
+  border-bottom: 1px solid black;
+}
+.details input {
+  width: 100%;
+}
+.details img {
+  height: 5em;
+  width: 10em;
+}
+.details h1 {
+  padding-left: 0;
+}
+/*--------------------Media queries--------------------------*/
+/*--------------------ID-------------------------------------*/
+#header {
+  background-color: #005D95;
+}
+#header h1 {
+  font-weight: bolder;
+  font-size: 1.4em;
+  color: #dadada;
+  padding-bottom: 0.1em;
+}
+#header h2 {
+  font-weight: bolder;
+  font-size: 1.3em;
+  color: #efefef;
+  padding-top: 0.1em;
+}
+#main {
+  border: 1px solid #dadada;
+  background-color: #efefef;
+}
+#main .searching h1 {
+  display: inline-block;
+}
+#main .searching input {
+  padding: 0.25em;
+  float: right;
+}
+#login {
+  padding-top: 0;
+}
+#login .article .border {
+  border: 1px solid #dadada;
+  background-color: #efefef;
+}
+/*--------------------Global Attributes--------------------------------*/
+img.icon {
+  height: 3em;
+  width: 2em;
+  padding-top: 1em;
+}
