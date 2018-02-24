@@ -1957,6 +1957,7 @@ fieldset {
 legend {
   padding: 0 0.5rem;
 }
+/*---------------------Variables-----------------------------*/
 /*--------------------Classes--------------------------------*/
 .article {
   margin: 0 auto;
@@ -1972,6 +1973,9 @@ legend {
 }
 .details input {
   width: 100%;
+}
+.details input.readonly {
+  opacity: 0.5;
 }
 .details img {
   height: 5em;

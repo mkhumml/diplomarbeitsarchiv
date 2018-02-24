@@ -1,8 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<?php
-    $test = "hallo";
-?>
 <head>
     <meta charset="UTF-8">
     <title>Diplomarbeitsarchiv</title>

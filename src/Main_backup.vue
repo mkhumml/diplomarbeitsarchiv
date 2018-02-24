@@ -2,7 +2,7 @@
     <div id="main" class="flz-box flz-75">
         <button v-on:click="hide = !hide">asdf</button>
         <button v-on:click="addDiploma" v-on:changeChide="updateHide($event)" v-bind:hide="hide">Create New</button>
-        <div class="flz-box">
+        <div v-if="diplomaLists && diplomaLists.length" class="flz-box">
             <div v-if="hide" class="flz-box flz-nospacer">
                 <div class="searching flz-nospacer">
                     <div class="flz-box flz-20 flz-nospacer">
@@ -15,7 +15,14 @@
                         <a href="#">Erweiterte Suche</a>
                     </div>
                 </div>
-                <div v-if="diplomaLists.length > 0">
+                <div v-if="search === ''">
+                    <div v-for="diplomalist in diplomaLists">
+                        <app-content v-on:changeChide="updateHide($event)" v-bind:hide="hide"
+                                     v-bind:diploma="diplomalist" v-on:detailKey="setDetailKey($event)">
+                        </app-content>
+                    </div>
+                </div>
+                <div v-else-if="search !== ''">
                     <div v-for="diplomalist in diplomaLists">
                         <app-content v-on:changeChide="updateHide($event)" v-bind:hide="hide"
                                      v-bind:diploma="diplomalist" v-on:detailKey="setDetailKey($event)">
@@ -44,9 +51,7 @@
         data() {
             return {
                 search: "",
-                diplomaLists: [] /*[ {
-                    'id' : 1, 'title' : "title1", 'author' : "author1", 'tutor' : "tutor1", 'department' : "department1", 'year' : "jahr1", 'upload' : "diplomathesispdf1", 'summary' : "summary1", 'attachments' : "attachments1", 'tags' : "tags1"
-                }]*/,
+                diplomaLists: [],
                 hide: true,
                 idDetail: 0,
                 searchedDiploma: [],
@@ -126,7 +131,7 @@
             },
         },
         created: function () {
-            axios.get('/diplomarbeitsarchiv/api/diplomarbeiten')
+            axios.get('/diplomarbeitsarchiv/services.php')
                 .then(response => {
                     // JSON responses are automatically parsed.
                     console.log(this.diplomaLists);
@@ -141,4 +146,17 @@
 </script>
 
 <style scoped>
+    this.diplomaLists.push({
+    "id": (this.diplomaLists.length + 1),
+    "title": "diplomarbeitstitel" + (this.diplomaLists.length + 1),
+    "author": "diplomarbeitsauthor" + (this.diplomaLists.length + 1),
+    "tutor": "diplomarbeitstutor" + (this.diplomaLists.length + 1),
+    "department": "fachabteilung" + (this.diplomaLists.length + 1),
+    "year": "jahr" + (this.diplomaLists.length + 1),
+    "upload": "diplomathesispdf" + (this.diplomaLists.length + 1),
+    "summary": "loremipsum" + (this.diplomaLists.length + 1),
+    "notes": "notes" + (this.diplomaLists.length + 1),
+    "attachments": "attachments" + (this.diplomaLists.length + 1),
+    "tags": "tags" + (this.diplomaLists.length + 1)
+    });
 </style>

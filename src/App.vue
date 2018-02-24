@@ -1,8 +1,8 @@
 <template>
     <div>
         <app-header></app-header>
-        <div class="flz-box">
-            <a href="#">Startseite</a>
+        <div class="flz-box flz-100">
+            <p></p>
         </div>
         <app-sideNav></app-sideNav>
         <app-main></app-main>
@@ -26,6 +26,9 @@
             return {
                 title: 'Njnja App'
             }
+        },
+        methods: {
+
         }
     }
 </script>

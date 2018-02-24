@@ -1,6 +1,6 @@
 @import 'floatz-2.0.0.alpha/core/floatz.core.less';
 @import 'floatz-2.0.0.alpha/form/floatz.form.less';
-
+/*---------------------Variables-----------------------------*/
 @color-gray-light: #efefef;
 @color-gray-mid: #dadada;
 @color-gray-dark: #aaaaaa;
@@ -16,18 +16,24 @@
   max-width: 75em;
   position: relative;
 }
+
 .content {
   background-color: #FFF;
   border-bottom: 1px solid black;
 }
+
 .contentArticle {
   h2 {
     border-bottom: 1px solid black;
   }
 }
+
 .details {
   input {
     width: 100%;
+    &.readonly {
+      opacity: 0.5;
+    }
   }
   img {
     height: 5em;
@@ -37,6 +43,7 @@
     padding-left: 0;
   }
 }
+
 /*--------------------Media queries--------------------------*/
 /*--------------------ID-------------------------------------*/
 #header {

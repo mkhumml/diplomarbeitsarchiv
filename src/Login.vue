@@ -3,32 +3,59 @@
         <div class="article flz-nospacer">
             <div class="flz-box flz-nospacer border">
                 <h1>Anmelden</h1>
-                <div class="flz-form">
+                <div class="flz-form" v-if="loggedIn === false">
                     <p></p>
-                    <input type="text" name="Email" value="Email">
+                    <input type="text" v-model="email">
                     <p></p>
-                    <input type="password" name="Password" value="Password"><br>
+                    <input type="password" v-model="password"><br>
                     <div class="flz-box flz-nospacer">
                         <div class="flz-box flz-50 flz-nospacer">
-                            <input type="submit" value="Login">
+                            <button v-on:click="login">Login</button>
                         </div>
                         <div class="flz-box flz-50 flz-nospacer">
                             <a href="#">Forgot password?</a>
                         </div>
                     </div>
-                    <p><a href="#">new Register</a></p>
+                    <p>new Register</p>
+                </div>
+                <div v-else-if="loggedIn" class="flz-form">
+                    <p v-model="lastUsedByMe"></p>
                 </div>
             </div>
         </div>
     </div>
 </template>
-
 <script>
     export default {
-        name: "login"
+        data() {
+            return {
+                email: "",
+                password: "",
+                loggedIn: false,
+                lastUsedByMe:"",
+                user: {
+                    email: this.email,
+                    password: this.password
+                }
+            }
+        },
+        methods: {
+            login: function () {
+                var myJSON = JSON.stringify(this.user);
+                axios.post('/diplomarbeitsarchiv/api/diplomarbeiten')
+                    .then(response => {
+                        // JSON responses are automatically parsed.
+                        console.log(this.diplomaLists);
+                        this.diplomaLists = response.data;
+                        console.log(this.diplomaLists);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                this.loggedIn = !this.loggedIn
+            }
+        }
     }
 </script>
-
 <style scoped>
-
 </style>

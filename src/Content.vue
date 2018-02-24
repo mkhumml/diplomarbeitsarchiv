@@ -2,12 +2,13 @@
     <div class="flz-box content">
         <div class="flz-box flz-nospacer">
             <div class="flz-box flz-nospacer">
+            <div class="flz-box flz-nospacer">
                 <div class="flz-box flz-5 flz-nospacer">
-                    <img class="icon" src="Images/Download.jpeg"/>
+                    <img class="icon" src="images/Download.jpeg"/>
                 </div>
                 <div class="flz-box flz-85 flz-nospacer">
-                    <h3>This should be a title</h3>
-                    <h2>This should be the year | This should be the department | This should be the tutor</h2>
+                    <h3>{{diploma.title}}</h3>
+                    <h2>{{diploma.year}} | {{diploma.department}} | {{diploma.tutor}}</h2>
                 </div>
                 <div class="flz-box flz-10 flz-nospacer">
                     <button @click="ok = !ok">Show</button>
@@ -18,7 +19,7 @@
                     <p></p>
                 </div>
                 <div class="flz-box flz-60 flz-nospacer contentArticle">
-                    <h2>Zusammenfassung {{test1}} - {{diploma.Title}} ({{diploma.id}})</h2>
+                    <h2>{{diploma.summary}}</h2>
                     <p>
                         Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
                         invidunt
@@ -39,14 +40,14 @@
                     </p>
                 </div>
                 <div class="flz-box flz-30 flz-nospacer contentArticle">
-                    <h2>Authoren</h2>
+                    <h2>{{diploma.author}}</h2>
                     <p>
                         Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
                         invidunt
                         ut labore et dolore magna aliquyam erat, sed diam voluptua.
                     </p>
                     <p>
-                        <button>View Details</button>
+                        <button v-on:click="changeHide">View Details</button>
                     </p>
                 </div>
                 <div class="flz-box flz-5 flz-nospacer">
@@ -74,10 +75,28 @@
 
 <script>
     export default {
-        props: ['test1','diploma'],
+        props: {
+            diploma: {
+                type: Object,
+                required: true
+            },
+            hide: {
+                type: Boolean,
+                required: true
+            }
+        },
         data() {
             return {
-                ok: false
+                ok: false,
+                key: 0
+            }
+        },
+        methods: {
+            changeHide: function() {
+                this.hide = !this.hide
+                this.$emit('changeChide',this.hide)
+                this.key = this.diploma.id
+                this.$emit('detailKey',this.key)
             }
         }
     }
