@@ -78,7 +78,6 @@ $sql = "INSERT INTO diplomarbeiten (Schuler1,Schuler2,Schuler3,Schuler4,Schuler5
  }else{
       echo "Fehler beim hochladen!";
     }
-    
 }
 ?>
 

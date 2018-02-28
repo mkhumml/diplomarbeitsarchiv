@@ -31,23 +31,23 @@
             return {
                 email: "",
                 password: "",
+                newEmail: "",
+                newPassword: "",
                 loggedIn: false,
-                lastUsedByMe:"",
-                user: {
-                    email: this.email,
-                    password: this.password
-                }
+                lastUsedByMe: "",
+                user: [
+                    {}
+                ]
             }
         },
         methods: {
             login: function () {
-                var myJSON = JSON.stringify(this.user);
-                axios.post('/diplomarbeitsarchiv/api/diplomarbeiten')
+                axios.post('/diplomarbeitsarchiv/api/diplomarbeiten/', {
+                    email: this.email,
+                    password: this.password
+                })
                     .then(response => {
-                        // JSON responses are automatically parsed.
-                        console.log(this.diplomaLists);
-                        this.diplomaLists = response.data;
-                        console.log(this.diplomaLists);
+                        console.log(response)
                     })
                     .catch(function (error) {
                         console.log(error);

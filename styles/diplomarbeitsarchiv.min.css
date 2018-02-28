@@ -1974,7 +1974,7 @@ legend {
 .details input {
   width: 100%;
 }
-.details input.readonly {
+.details input[readonly] {
   opacity: 0.5;
 }
 .details img {

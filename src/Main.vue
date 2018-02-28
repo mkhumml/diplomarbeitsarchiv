@@ -15,7 +15,7 @@
                         <a href="#">Erweiterte Suche</a>
                     </div>
                 </div>
-                <div v-if="diplomaLists.length > 0">
+                <div v-if="this.diplomaLists.length > 0">
                     <div v-for="diplomalist in diplomaLists">
                         <app-content v-on:changeChide="updateHide($event)" v-bind:hide="hide"
                                      v-bind:diploma="diplomalist" v-on:detailKey="setDetailKey($event)">
@@ -25,8 +25,9 @@
             </div>
             <div v-else-if="hide === false" class="flz-box flz-nospacer border">
                 <app-details v-on:changeChide="updateHide($event)" v-bind:hide="hide"
-                             v-bind:diploma="diplomaLists[this.idDetail - 1]" v-on:detailKey="setDetailKey($event)"
-                             v-on:postUpdate="postSave($event)" v-on:deleteDiploma="deleteDiploma($event)">
+                             v-bind:diploma="diplomaLists[this.idDetail - 1]"
+                             v-bind:editonly="editonly"
+                             v-on:detailKey="setDetailKey($event)" v-on:deleteDiploma="deleteDiploma($event)">
                 </app-details>
             </div>
         </div>
@@ -44,13 +45,14 @@
         data() {
             return {
                 search: "",
-                diplomaLists: [] /*[ {
-                    'id' : 1, 'title' : "title1", 'author' : "author1", 'tutor' : "tutor1", 'department' : "department1", 'year' : "jahr1", 'upload' : "diplomathesispdf1", 'summary' : "summary1", 'attachments' : "attachments1", 'tags' : "tags1"
-                }]*/,
+                diplomaLists: [
+                    {}
+                ],
                 hide: true,
                 idDetail: 0,
                 searchedDiploma: [],
-                searchedDiplomaResults: [{}]
+                searchedDiplomaResults: [{}],
+                editonly: false
             }
         },
         methods: {
@@ -62,9 +64,7 @@
                 console.log(this.idDetail)
             },
             postSave: function (e) {
-                axios.post('http://localhost:80/diplomarbeitsarchiv/service.php', {
-                    diploma: this.diplomaLists[e - 1]
-                })
+                axios.post('diplomarbeitsarchiv/diplomarbeiten', this.diplomaLists[e - 1])
                     .then(function (response) {
                         console.log(response);
                     })
@@ -74,33 +74,24 @@
             },
             addDiploma: function () {
                 this.diplomaLists.push({
-                    "id": (this.diplomaLists.length + 1),
-                    "title": "diplomarbeitstitel" + (this.diplomaLists.length + 1),
-                    "author": "diplomarbeitsauthor" + (this.diplomaLists.length + 1),
-                    "tutor": "diplomarbeitstutor" + (this.diplomaLists.length + 1),
-                    "department": "fachabteilung" + (this.diplomaLists.length + 1),
-                    "year": "jahr" + (this.diplomaLists.length + 1),
-                    "upload": "diplomathesispdf" + (this.diplomaLists.length + 1),
-                    "summary": "loremipsum" + (this.diplomaLists.length + 1),
-                    "notes": "notes" + (this.diplomaLists.length + 1),
-                    "attachments": "attachments" + (this.diplomaLists.length + 1),
-                    "tags": "tags" + (this.diplomaLists.length + 1)
+                    "id": "",
+                    "title": "",
+                    "author": "",
+                    "tutor": "",
+                    "department": "",
+                    "year": "",
+                    "upload": "",
+                    "summary": "",
+                    "notes": "",
+                    "attachments": "",
+                    "tags": ""
                 });
-                alert("You have added new diploma data")
-                axios.post('http://localhost:80/diplomarbeitsarchiv/service.php', {
-                    diploma: this.diplomaLists[this.diplomaLists.length - 1]
-                })
-                    .then(function (response) {
-                        console.log(response);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                this.idDetail = this.diplomaLists.length;
+                this.editonly = true;
+                this.hide = !this.hide;
             },
             deleteDiploma: function (e) {
-                axios.post('http://localhost:80/diplomarbeitsarchiv/service.php', {
-                    diploma: this.diplomaLists[e - 1]
-                })
+                axios.post('/diplomarbeitsarchiv/api/diplomarbeiten/', this.diplomaLists[e - 1])
                     .then(function (response) {
                         console.log(response);
                     })
@@ -121,7 +112,9 @@
                     }
                 }
                 this.searchedDiploma = results.join('')
-                console.log(this.searchedDiploma)
+                axios.post('/diplomarbeitsarchiv/api/diplomarbeiten', this.searchedDiploma)
+                    .then(response => {
+                    })
                 return this.searchedDiploma
             },
         },
@@ -129,9 +122,7 @@
             axios.get('/diplomarbeitsarchiv/api/diplomarbeiten')
                 .then(response => {
                     // JSON responses are automatically parsed.
-                    console.log(this.diplomaLists);
                     this.diplomaLists = response.data;
-                    console.log(this.diplomaLists);
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -139,6 +130,5 @@
         }
     }
 </script>
-
 <style scoped>
 </style>
