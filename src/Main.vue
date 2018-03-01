@@ -45,13 +45,11 @@
         data() {
             return {
                 search: "",
-                diplomaLists: [
-                    {}
-                ],
+                diplomaLists: [],
                 hide: true,
                 idDetail: 0,
                 searchedDiploma: [],
-                searchedDiplomaResults: [{}],
+                searchedDiplomaResults: [],
                 editonly: false
             }
         },
@@ -76,8 +74,8 @@
                 this.diplomaLists.push({
                     "id": "",
                     "title": "",
-                    "author": "",
-                    "tutor": "",
+                    "authors": "",
+                    "tutors": "",
                     "department": "",
                     "year": "",
                     "upload": "",
@@ -118,7 +116,7 @@
                 return this.searchedDiploma
             },
         },
-        created: function () {
+        beforeCreate: function () {
             axios.get('/diplomarbeitsarchiv/api/diplomarbeiten')
                 .then(response => {
                     // JSON responses are automatically parsed.
