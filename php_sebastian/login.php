@@ -48,6 +48,13 @@ echo $json;
 echo $json["email"];
 echo $json["password"];
 ?>
+
+
+
+
+
+
+
 <?php
 if ($_SESSION["login"] != 1) {  //Wenn Session Variable login ungleich 1, also user nicht eingeloggt, dann wird anmeldeformular angezeigt
 

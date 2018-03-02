@@ -89,7 +89,7 @@
                 this.hide = !this.hide;
             },
             deleteDiploma: function (e) {
-                axios.post('/diplomarbeitsarchiv/api/diplomarbeiten/', this.diplomaLists[e - 1])
+                axios.post('/diplomarbeitsarchiv/api/diplomarbeiten', this.diplomaLists[e - 1])
                     .then(function (response) {
                         console.log(response);
                     })

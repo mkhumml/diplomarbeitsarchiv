@@ -10,12 +10,14 @@
                 <!--<input v-model="diploma.author" v-bind:readonly="!editonly">-->
                 <multiselect v-model="selectedAuthors" :options="optionsAuthors" :readonly="!editonly"
                              :multiple="true" :close-on-select="false" :hide-selected="true"
-                             :track-by="id" :custom-label="showAuthor" :clear-on-select="false" selectLabel=""></multiselect>
+                             @input="postSelectedAuthors"
+                             :track-by="id" :custom-label="showAuthor" :clear-on-select="false"
+                             selectLabel=""></multiselect>
             </div>
             <div class="flz-box flz-50">
                 <h1>Tutors</h1>
                 <multiselect v-model="selectedTutors" :options="optionsTutors" :readonly="!editonly"
-                             :multiple="true" :close-on-select="false" :hide-selected="true"
+                             :multiple="true" :close-on-select="false" :hide-selected="true" @input="postSelectedTutors"
                              :track-by="id" :custom-label="showTutor" :clear-on-select="false"></multiselect>
             </div>
         </div>
@@ -25,7 +27,7 @@
         <div class="flz-box flz-50">
             <h1>Department</h1>
             <multiselect v-model="selectedDepartments" :options="optionsDepartments" :readonly="!editonly"
-                         :multiple="true" :close-on-select="false" :hide-selected="true"
+                         :multiple="true" :close-on-select="false" :hide-selected="true" @input="postSelectedDepartment"
                          :track-by="id" :custom-label="showDepartment" :clear-on-select="false"></multiselect>
         </div>
         <div class="flz-box flz-50 flz-nospacer">
@@ -70,7 +72,7 @@
             <h1>Tags</h1>
             <multiselect v-model="tags" :options="optionsTags" :readonly="!editonly" :taggable="true"
                          @tag="pushTags" :multiple="true" :close-on-select="false" :hide-selected="true"
-                         :clear-on-select="false"></multiselect>
+                         @input="postSelectedTags" :clear-on-select="false"></multiselect>
         </div>
         <div class="flz-box">
             <button v-show="!editonly" v-on:click="changeEdit">Edit</button>
@@ -115,7 +117,7 @@
                 selectedAuthors: this.diploma.authors,
                 selectedDepartments: this.diploma.departments,
                 selectedTags: this.diploma.tags,
-                selectedTutors: this.diploma.tutor,
+                selectedTutors: this.diploma.tutors,
                 optionsAuthors: [],
                 optionsDepartments: [],
                 optionsTags: [],
@@ -142,7 +144,7 @@
             showTutor(tutor) {
                 return `${tutor.firstname} ${tutor.lastname}`;
             },
-            showDepartment(department){
+            showDepartment(department) {
                 return department.name;
             },
             changeEdit() {
@@ -151,14 +153,21 @@
             pushTags(newTag) {
                 this.optionsTags.push(newTag)
                 this.tags.push(newTag)
-                console.log(this.optionsTags)
-                console.log(newTag)
             },
             save() {
                 axios.post('/diplomarbeitsarchiv/api/diplomarbeiten/', this.diploma)
                     .then(response => {
                         console.log(response.data);
                         this.diploma.title = response.data.title;
+                        this.diploma.authors = response.data.authors;
+                        this.diploma.tutors = response.data.tutors;
+                        this.diploma.departments = response.data.departments;
+                        this.diploma.year = response.data.year;
+                        this.diploma.upload = response.data.upload;
+                        this.diploma.summary = response.data.summary;
+                        this.diploma.attachments = response.data.attachments;
+                        this.diploma.tags = response.data.tags;
+
                         this.changeEdit();
                     })
                     .catch(function (error) {
@@ -173,9 +182,53 @@
                     .catch(function (error) {
                         console.log(error);
                     });
+            },
+            postSelectedAuthors() {
+                axios.post('/diplomarbeitsarchiv/api/authors/', JSON.stringify(this.selectedAuthors))
+                    .then(response => {
+                        console.log(response.data)
+                        this.selectedAuthors = response.data
+                        this.diploma.authors = response.data
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            postSelectedTutors() {
+                axios.post('/diplomarbeitsarchiv/api/tutors/', JSON.stringify(this.selectedTutors))
+                    .then(response => {
+                        console.log(response.data)
+                        this.selectedTutors = response.data
+                        this.diploma.tutors = response.data
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            postSelectedDepartment() {
+                axios.post('/diplomarbeitsarchiv/api/departments/', JSON.stringify(this.selectedDepartments))
+                    .then(response => {
+                        console.log(response.data)
+                        this.selectedDepartments = response.data
+                        this.diploma.departments = response.data
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            postSelectedTags() {
+                axios.post('/diplomarbeitsarchiv/api/tags/', JSON.stringify(this.selectedTags))
+                    .then(response => {
+                        console.log(response.data)
+                        this.selectedTags = response.data
+                        this.diploma.tags = response.data
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             }
         },
-        created: function () {
+        created() {
             console.log(this.diploma.authors)
             axios.get('/diplomarbeitsarchiv/api/authors')
                 .then(response => {

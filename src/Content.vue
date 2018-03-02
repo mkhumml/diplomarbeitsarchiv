@@ -115,7 +115,7 @@
             showTutors(tutors) {
                 let display = "";
                 for(let i = 0; i<tutors.length;i++) {
-                    display += tutors[i].firstname + " "
+                    display += tutors[i].firstname + " " + tutors[i].lastname + " "
                     if (i < (tutors.length -1)) {
                         display += ""
                     }
