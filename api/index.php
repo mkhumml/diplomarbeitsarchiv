@@ -13,12 +13,14 @@ Flight::route('GET /diplomarbeiten', function () {
     $departments[] = array('id' => "3", 'name' => 'Fachschule');
     $tutors[] = array('id' => "1", 'firstname' => 'Erik', 'lastname' => 'Sacher');
     $tutors[] = array('id' => "2", 'firstname' => 'Bernhard', 'lastname' => 'Loibner');
-    $diploma[] = array('id' => 1, 'title' => "title1", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr1", 'upload' => "diplomathesispdf1", 'summary' => "summary1", 'attachments' => "attachments1", 'tags' => "tags1");
-    $diploma[] = array('id' => 2, 'title' => "title2", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr2", 'upload' => "diplomathesispdf2", 'summary' => "summary2", 'attachments' => "attachments2", 'tags' => "tags2");
-    $diploma[] = array('id' => 3, 'title' => "title3", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr3", 'upload' => "diplomathesispdf3", 'summary' => "summary3", 'attachments' => "attachments3", 'tags' => "tags3");
-    $diploma[] = array('id' => 4, 'title' => "title4", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr4", 'upload' => "diplomathesispdf4", 'summary' => "summary4", 'attachments' => "attachments4", 'tags' => "tags4");
-    $diploma[] = array('id' => 5, 'title' => "title5", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr5", 'upload' => "diplomathesispdf5", 'summary' => "summary5", 'attachments' => "attachments5", 'tags' => "tags5");
-    $diploma[] = array('id' => 6, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => "summary6", 'attachments' => "attachments6", 'tags' => "tags6");
+    $tags[] = array('id' => "1", 'name' => 'Javascript');
+    $tags[] = array('id' => "2", 'name' => 'HTML');
+    $diploma[] = array('id' => 1, 'title' => "title1", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr1", 'upload' => "diplomathesispdf1", 'summary' => "summary1", 'attachments' => "attachments1", 'tags' => $tags);
+    $diploma[] = array('id' => 2, 'title' => "title2", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr2", 'upload' => "diplomathesispdf2", 'summary' => "summary2", 'attachments' => "attachments2", 'tags' => $tags);
+    $diploma[] = array('id' => 3, 'title' => "title3", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr3", 'upload' => "diplomathesispdf3", 'summary' => "summary3", 'attachments' => "attachments3", 'tags' => $tags);
+    $diploma[] = array('id' => 4, 'title' => "title4", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr4", 'upload' => "diplomathesispdf4", 'summary' => "summary4", 'attachments' => "attachments4", 'tags' => $tags);
+    $diploma[] = array('id' => 5, 'title' => "title5", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr5", 'upload' => "diplomathesispdf5", 'summary' => "summary5", 'attachments' => "attachments5", 'tags' => $tags);
+    $diploma[] = array('id' => 6, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => "summary6", 'attachments' => "attachments6", 'tags' => $tags);
     echo json_encode($diploma);
 });
 
@@ -26,7 +28,7 @@ Flight::route('GET /users', function () {
     $users[] = array('id' => "2", 'email' => 'stefan', 'password' => 'stefan');
     $users[] = array('id' => "1", 'email' => 'markus', 'password' => 'markus');
     $users[] = array('id' => "3", 'email' => 'sebi', 'password' => 'sebi');
-    $users[] = array('id' => "4", 'email' => 'paul', 'password' => 'paul');
+    $users[] = array('id' => "4", 'email' => 'karl', 'password' => 'karl');
     echo json_encode($users);
 });
 
@@ -51,6 +53,13 @@ Flight::route('GET /departments', function () {
     echo json_encode($departments);
 });
 
+Flight::route('GET /tags', function () {
+    $tags[] = array('id' => "1", 'name' => 'Javascript');
+    $tags[] = array('id' => "2", 'name' => 'HTML');
+    $tags[] = array('id' => "3", 'name' => 'MySQL');
+    $tags[] = array('id' => "4", 'name' => 'CSS');
+    echo json_encode($tags);
+});
 
 Flight::route('GET /diplomarbeiten/@id', function ($id) {
     $arr1 = array('id' => $id, 'title' => "title1", 'author' => "author1", 'tutor' => "tutor1", 'departments' => "department1", 'year' => "jahr1", 'upload' => "diplomathesispdf1", 'summary' => "summary1", 'attachments' => "attachments1", 'tags' => "tags1");
@@ -61,7 +70,7 @@ Flight::route('DELETE /diplomarbeiten/@id', function ($id) {
     echo "$id";
 });
 
-// Create or update diploma
+// Save diploma
 Flight::route('POST /diplomarbeiten', function () {
     $json = file_get_contents("php://input");
     $diploma = json_decode($json, true);
@@ -103,6 +112,13 @@ Flight::route('POST /departments', function () {
     $departments = json_decode($json, true);
     $departments[0]["name"] = "DepartmentFromServer";
     echo json_encode($departments);
+});
+
+Flight::route('POST /tags', function() {
+    $json = file_get_contents("php//input");
+    $tags = json_decode($json, true);
+    $tags[0]["name"] = "TagFromServer";
+    echo json_encode($tags);
 });
 
 /*

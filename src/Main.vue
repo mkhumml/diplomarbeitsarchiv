@@ -24,10 +24,10 @@
                 </div>
             </div>
             <div v-else-if="hide === false" class="flz-box flz-nospacer border">
-                <app-details v-on:changeChide="updateHide($event)" v-bind:hide="hide"
+                <app-details v-on:changeChide="updateHide($event)"
                              v-bind:diploma="diplomaLists[this.idDetail - 1]"
-                             v-bind:editonly="editonly"
-                             v-on:detailKey="setDetailKey($event)" v-on:deleteDiploma="deleteDiploma($event)">
+                             v-on:detailKey="setDetailKey($event)"
+                             v-on:deleteDiploma="deleteDiploma($event)">
                 </app-details>
             </div>
         </div>
@@ -49,13 +49,12 @@
                 hide: true,
                 idDetail: 0,
                 searchedDiploma: [],
-                searchedDiplomaResults: [],
-                editonly: false
+                searchedDiplomaResults: []
             }
         },
         methods: {
-            updateHide: function (updatedHide) {
-                this.hide = updatedHide
+            updateHide: function (hide) {
+                this.hide = hide
             },
             setDetailKey: function (setDetailKey) {
                 this.idDetail = setDetailKey
@@ -85,7 +84,6 @@
                     "tags": ""
                 });
                 this.idDetail = this.diplomaLists.length;
-                this.editonly = true;
                 this.hide = !this.hide;
             },
             deleteDiploma: function (e) {

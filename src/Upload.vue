@@ -1,8 +1,8 @@
 <template>
     <div class="container">
         <div class="large-12 medium-12 small-12 cell">
-            <input type="file" id="files" ref="files" multiple v-on:change="handleFileUpload()"/>
-            <button v-on:click="submitFiles()">Submit</button>
+            <input type="file" id="files" ref="files" multiple v-on:change="handleFileUpload()" :readonly="readonly"/>
+            <button v-on:click="submitFiles()" :disabled="readonly">Submit</button>
         </div>
     </div>
 </template>
@@ -10,6 +10,12 @@
 <script>
     export default {
         name: 'app',
+        props : {
+            readonly : {
+                type: Boolean,
+                required: true
+            }
+        },
         data() {
             return {
                 files: ''

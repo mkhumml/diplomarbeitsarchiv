@@ -8,7 +8,8 @@
                     </div>
                     <div class="flz-box flz-85 flz-nospacer">
                         <h3>{{diploma.title}}</h3>
-                        <h2>{{diploma.year}} | {{showDepartments(diploma.departments)}} | {{showTutors(diploma.tutors)}}</h2>
+                        <h2>{{diploma.year}} | {{showDepartments(diploma.departments)}} |
+                            {{showTutors(diploma.tutors)}}</h2>
                     </div>
                     <div class="flz-box flz-10 flz-nospacer">
                         <button @click="ok = !ok">Show</button>
@@ -61,12 +62,7 @@
                 </div>
                 <div class="flz-box flz-95 flz-nospacer">
                     <p>
-                        <span>Icon1</span>
-                        <span>Tag1</span>
-                        <span>Icon2</span>
-                        <span>Tag2</span>
-                        <span>Icon3</span>
-                        <span>Tag3</span>
+                        {{showTags(this.diploma.tags)}}
                     </p>
                 </div>
             </div>
@@ -114,15 +110,25 @@
             },
             showTutors(tutors) {
                 let display = "";
-                for(let i = 0; i<tutors.length;i++) {
+                for (let i = 0; i < tutors.length; i++) {
                     display += tutors[i].firstname + " " + tutors[i].lastname + " "
-                    if (i < (tutors.length -1)) {
+                    if (i < (tutors.length - 1)) {
                         display += ""
                     }
                 }
                 return display
-            }
-        },
+            },
+            showTags(tags) {
+                let display = "";
+                for (let i = 0; i < tags.length; i++) {
+                    display += tags[i].name + " "
+                    if (i < (tags.length - 1)) {
+                    }
+
+                }
+                return display
+            },
+        }
     }
 </script>
 

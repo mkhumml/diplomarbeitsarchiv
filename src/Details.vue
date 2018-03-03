@@ -3,21 +3,19 @@
         <div class="flz-box flz-66 flz-nospacer">
             <div class="flz-box">
                 <h1>Title</h1>
-                <input v-model="diploma.title" v-bind:readonly="!editonly">
+                <input v-model="diploma.title" :readonly="readonly">
             </div>
             <div class="flz-box flz-50">
                 <h1>Authors</h1>
-                <!--<input v-model="diploma.author" v-bind:readonly="!editonly">-->
-                <multiselect v-model="selectedAuthors" :options="optionsAuthors" :readonly="!editonly"
+                <multiselect v-model="diploma.authors" :options="optionsAuthors" :disabled="readonly"
                              :multiple="true" :close-on-select="false" :hide-selected="true"
-                             @input="postSelectedAuthors"
                              :track-by="id" :custom-label="showAuthor" :clear-on-select="false"
                              selectLabel=""></multiselect>
             </div>
             <div class="flz-box flz-50">
                 <h1>Tutors</h1>
-                <multiselect v-model="selectedTutors" :options="optionsTutors" :readonly="!editonly"
-                             :multiple="true" :close-on-select="false" :hide-selected="true" @input="postSelectedTutors"
+                <multiselect v-model="diploma.tutors" :options="optionsTutors" :disabled="readonly"
+                             :multiple="true" :close-on-select="false" :hide-selected="true"
                              :track-by="id" :custom-label="showTutor" :clear-on-select="false"></multiselect>
             </div>
         </div>
@@ -26,14 +24,15 @@
         </div>
         <div class="flz-box flz-50">
             <h1>Department</h1>
-            <multiselect v-model="selectedDepartments" :options="optionsDepartments" :readonly="!editonly"
-                         :multiple="true" :close-on-select="false" :hide-selected="true" @input="postSelectedDepartment"
-                         :track-by="id" :custom-label="showDepartment" :clear-on-select="false"></multiselect>
+            <multiselect v-model="diploma.departments" :options="optionsDepartments" :disabled="readonly"
+                         :multiple="true" :close-on-select="false" :hide-selected="true"
+                         :track-by="id" :custom-label="showDepartment"
+                         :clear-on-select="false"></multiselect>
         </div>
         <div class="flz-box flz-50 flz-nospacer">
             <div class="flz-box flz-33">
                 <h1>Year</h1>
-                <input v-model="diploma.year" v-bind:readonly="!editonly">
+                <input v-model="diploma.year" :readonly="readonly">
             </div>
             <div class="flz-box flz-66">
                 <h1>Diplomathesi</h1>
@@ -52,33 +51,33 @@
                         </div>
                     </template>
                 </vue-clip>-->
-                <app-upload></app-upload>
-                <input v-model="diploma.upload" v-bind:readonly="!editonly">
+                <app-upload v-bind:readonly="readonly"></app-upload>
+                <input v-model="diploma.upload" :readonly="readonly">
             </div>
         </div>
         <div class="flz-box flz-33">
             <h1>Summary</h1>
-            <input v-model="diploma.summary" v-bind:readonly="!editonly">
+            <input v-model="diploma.summary" :readonly="readonly">
         </div>
         <div class="flz-box flz-33">
             <h1>Notes</h1>
-            <input v-model="diploma.notes" v-bind:readonly="!editonly">
+            <input v-model="diploma.notes" :readonly="readonly">
         </div>
         <div class="flz-box flz-33">
             <h1>Attachments</h1>
-            <input v-model="diploma.attachments" v-bind:readonly="!editonly">
+            <input v-model="diploma.attachments" :readonly="readonly">
         </div>
         <div class="flz-box">
             <h1>Tags</h1>
-            <multiselect v-model="tags" :options="optionsTags" :readonly="!editonly" :taggable="true"
-                         @tag="pushTags" :multiple="true" :close-on-select="false" :hide-selected="true"
-                         @input="postSelectedTags" :clear-on-select="false"></multiselect>
+            <multiselect v-model="diploma.tags" :options="optionsTags" :disabled="readonly"
+                         :taggable="true" :multiple="true" :close-on-select="false" :hide-selected="true"
+                         :custom-label="showTags" :clear-on-select="false"></multiselect>
         </div>
         <div class="flz-box">
-            <button v-show="!editonly" v-on:click="changeEdit">Edit</button>
-            <button v-show="!editonly" v-on:click="deleteDiploma">Delete</button>
-            <button v-show="editonly" v-on:click="save">Save</button>
-            <button v-show="editonly" v-on:click="reset">Cancel</button>
+            <button v-show="readonly" v-on:click="onEdit">Edit</button>
+            <button v-show="readonly" v-on:click="onDelete">Delete</button>
+            <button v-show="! readonly" v-on:click="onSave">Save</button>
+            <button v-show="! readonly" v-on:click="onReset">Cancel</button>
         </div>
     </div>
 </template>
@@ -93,10 +92,6 @@
         props: {
             diploma: {
                 type: Object,
-                required: true
-            },
-            editonly: {
-                type: Boolean,
                 required: true
             }
         },
@@ -114,18 +109,16 @@
                     attachments: this.diploma.attachments,
                     tags: this.diploma.tags
                 },
-                selectedAuthors: this.diploma.authors,
-                selectedDepartments: this.diploma.departments,
-                selectedTags: this.diploma.tags,
-                selectedTutors: this.diploma.tutors,
                 optionsAuthors: [],
                 optionsDepartments: [],
                 optionsTags: [],
                 optionsTutors: [],
+                readonly: true,
             }
         },
         methods: {
-            reset() {
+            onReset() {
+                this.setReadonly(true);
                 this.diploma.id = this.diplomaOrig.id;
                 this.diploma.title = this.diplomaOrig.title;
                 this.diploma.authors = this.diplomaOrig.authors;
@@ -136,7 +129,6 @@
                 this.diploma.summary = this.diplomaOrig.summary;
                 this.diploma.attachments = this.diplomaOrig.attachments;
                 this.diploma.tags = this.diplomaOrig.tags;
-                this.changeEdit();
             },
             showAuthor(author) {
                 return `${author.firstname} ${author.lastname}`;
@@ -147,14 +139,16 @@
             showDepartment(department) {
                 return department.name;
             },
-            changeEdit() {
-                this.editonly = !this.editonly
+            showTags(tag) {
+                return tag.name;
             },
-            pushTags(newTag) {
-                this.optionsTags.push(newTag)
-                this.tags.push(newTag)
+            onEdit() {
+                this.setReadonly(false);
             },
-            save() {
+            setReadonly(readonly) {
+                this.readonly = readonly;
+            },
+            onSave() {
                 axios.post('/diplomarbeitsarchiv/api/diplomarbeiten/', this.diploma)
                     .then(response => {
                         console.log(response.data);
@@ -167,14 +161,13 @@
                         this.diploma.summary = response.data.summary;
                         this.diploma.attachments = response.data.attachments;
                         this.diploma.tags = response.data.tags;
-
-                        this.changeEdit();
+                        this.setReadonly(true);
                     })
                     .catch(function (error) {
                         console.log(error);
                     });
             },
-            deleteDiploma() {
+            onDelete() {
                 axios.delete('/diplomarbeitsarchiv/api/diplomarbeiten/' + this.diploma.id)
                     .then(response => {
                         this.$emit('deleteDiploma', response.data)
@@ -183,53 +176,8 @@
                         console.log(error);
                     });
             },
-            postSelectedAuthors() {
-                axios.post('/diplomarbeitsarchiv/api/authors/', JSON.stringify(this.selectedAuthors))
-                    .then(response => {
-                        console.log(response.data)
-                        this.selectedAuthors = response.data
-                        this.diploma.authors = response.data
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            },
-            postSelectedTutors() {
-                axios.post('/diplomarbeitsarchiv/api/tutors/', JSON.stringify(this.selectedTutors))
-                    .then(response => {
-                        console.log(response.data)
-                        this.selectedTutors = response.data
-                        this.diploma.tutors = response.data
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            },
-            postSelectedDepartment() {
-                axios.post('/diplomarbeitsarchiv/api/departments/', JSON.stringify(this.selectedDepartments))
-                    .then(response => {
-                        console.log(response.data)
-                        this.selectedDepartments = response.data
-                        this.diploma.departments = response.data
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            },
-            postSelectedTags() {
-                axios.post('/diplomarbeitsarchiv/api/tags/', JSON.stringify(this.selectedTags))
-                    .then(response => {
-                        console.log(response.data)
-                        this.selectedTags = response.data
-                        this.diploma.tags = response.data
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            }
         },
         created() {
-            console.log(this.diploma.authors)
             axios.get('/diplomarbeitsarchiv/api/authors')
                 .then(response => {
                     // JSON responses are automatically parsed.
@@ -254,13 +202,18 @@
                 .catch(function (error) {
                     console.log(error);
                 });
+            axios.get('/diplomarbeitsarchiv/api/tags')
+                .then(response => {
+                    // JSON responses are automatically parsed.
+                    this.optionsTags = response.data;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         }
     }
 
 </script>
 
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
-
-<style scoped>
-
-</style>
+<style scoped></style>

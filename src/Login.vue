@@ -3,11 +3,11 @@
         <div class="article flz-nospacer">
             <div class="flz-box flz-nospacer border">
                 <h1>Anmelden</h1>
-                <div class="flz-form" v-if="loggedIn === false">
-                    <p></p>
-                    <input type="email" v-model="email">
-                    <p></p>
-                    <input type="password" v-model="password"><br>
+                <div class="flz-form" v-if="loggedIn === false && register === false">
+                    <label>Email</label>
+                    <input type="text" v-model="email">
+                    <label>Passwort</label>
+                    <input type="text" v-model="password"><br>
                     <div class="flz-box flz-nospacer">
                         <div class="flz-box flz-50 flz-nospacer">
                             <button v-on:click="login">Login</button>
@@ -16,19 +16,20 @@
                             <a href="#">Forgot password?</a>
                         </div>
                     </div>
-                    <p v-on:click="setRegister">new Register</p>
+                    <a v-on:click="this.register = true">new Register</a>
                 </div>
-                <div v-else-if="loggedIn" class="flz-form">
+                <div v-else-if="loggedIn === true && register === false" class="flz-form">
                     <p v-model="lastUsedByMe"></p>
                 </div>
                 <div class="flz-form" v-if="register === true">
-                    <p></p>
+                    <label>Email</label>
                     <input type="email" v-model="newEmail">
-                    <p></p>
+                    <label>Passwort</label>
                     <input type="password" v-model="newPassword"><br>
                     <div class="flz-box flz-nospacer">
                         <div class="flz-box flz-50 flz-nospacer">
-                            <button v-on:click="registerNew">Login</button>
+                            <button v-on:click="registerNew">Register</button>
+                            <button v-on:click="this.register = false">Cancel</button>
                         </div>
                     </div>
                 </div>
@@ -68,9 +69,6 @@
                         console.log(error);
                     });
             },
-            setRegister() {
-                this.register = true
-            },
             registerNew() {
                 this.register = false
                 this.users[0].email = this.newEmail;
@@ -82,6 +80,7 @@
                     .catch(function (error) {
                         console.log(error);
                     });
+                this.register = false;
             }
         },
         beforeCreate: function () {
