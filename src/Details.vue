@@ -172,14 +172,14 @@
                 this.readonly = readonly;
             },
             addTag(tagName) {
-                let tag = {id: 99, name: tagName};
+                let tag = {id: null, name: tagName};
                 this.optionsTags.push(tag);
                 this.diploma.tags.push(tag);
             },
             addAuthor(authorName) {
                 let parts = authorName.split(" ")
                 if (parts.length <= 2) {
-                    let author = {id: 99, firstname: parts[0], lastname: parts[1]};
+                    let author = {id: null, firstname: parts[0], lastname: parts[1]};
                     this.optionsAuthors.push(author);
                     this.diploma.authors.push(author);
                     console.log("successAddAuthor")
@@ -191,7 +191,7 @@
             addTutor(tutorName) {
                 let parts = tutorName.split(" ")
                 if (parts.length <= 2) {
-                    let tutor = {id: 99, firstname: parts[0], lastname: parts[1]};
+                    let tutor = {id: null, firstname: parts[0], lastname: parts[1]};
                     this.optionsTutors.push(tutor);
                     this.diploma.tutors.push(tutor);
                     console.log("successAddTutor")
@@ -201,7 +201,7 @@
                 }
             },
             addDepartment(departmentName) {
-                let department = {id: 99, name: departmentName};
+                let department = {id: null, name: departmentName};
                 this.optionsDepartments.push(department);
                 this.diploma.departments.push(department);
             },
