@@ -12,43 +12,26 @@
                             {{showTutors(diploma.tutors)}}</h2>
                     </div>
                     <div class="flz-box flz-10 flz-nospacer">
-                        <button @click="ok = !ok">Show</button>
+                        <button @click="collapsed = !collapsed">Show</button>
                     </div>
                 </div>
-                <div v-show="ok" class="flz-box flz-100 article flz-nospacer">
+                <div v-show="collapsed" class="flz-box flz-100 article flz-nospacer">
                     <div class="flz-box flz-5 flz-nospacer">
                         <p></p>
                     </div>
                     <div class="flz-box flz-60 flz-nospacer contentArticle">
-                        <h2>{{diploma.summary}}</h2>
+                        <h2>Summary</h2>
                         <p>
-                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
-                            invidunt
-                            ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et
-                            justo
-                            duo
-                            dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum
-                            dolor
-                            sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
-                            eirmod
-                            tempor
-                            invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et
-                            accusam
-                            et
-                            justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est
-                            Lorem
-                            ipsum dolor sit amet.
+                            {{diploma.summary}}
                         </p>
                     </div>
                     <div class="flz-box flz-30 flz-nospacer contentArticle">
-                        <h2>{{diploma.author}}</h2>
+                        <h2>Notes</h2>
                         <p>
-                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
-                            invidunt
-                            ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                            {{diploma.notes}}
                         </p>
                         <p>
-                            <button v-on:click="changeHide">View Details</button>
+                            <button v-on:click="onViewDiploma">View Details</button>
                         </p>
                     </div>
                     <div class="flz-box flz-5 flz-nospacer">
@@ -76,30 +59,20 @@
             diploma: {
                 type: Object,
                 required: true
-            },
-            hide: {
-                type: Boolean,
-                required: true
             }
         },
         data() {
             return {
-                ok: false,
-                key: 0
+                collapsed: false
             }
         },
         methods: {
-            changeHide() {
-                this.hide = !this.hide
-                this.$emit('changeChide', this.hide)
-                this.key = this.diploma.id
-                this.$emit('detailKey', this.key)
+            onViewDiploma() {
+                console.log("select " + this.diploma);
+                this.$emit('onSelectDiploma', this.diploma);
             },
             showDepartments(departments) {
                 let display = "";
-                /*for (let department of departments) {
-                    display += department.name + ", ";
-                } */
                 for (let i = 0; i < departments.length; i++) {
                     display += departments[i].name;
                     if (i < (departments.length - 1)) {

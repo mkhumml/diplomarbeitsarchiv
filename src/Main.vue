@@ -1,33 +1,32 @@
 <template>
     <div id="main" class="flz-box flz-75">
-        <button v-on:click="hide = !hide">asdf</button>
-        <button v-on:click="addDiploma" v-on:changeChide="updateHide($event)" v-bind:hide="hide">Create New</button>
+        <button v-show="detailVisible" v-on:click="onBackToList">Back to list</button>
+        <button v-show="!detailVisible" v-on:click="onCreateDiploma">Create New</button>
         <div class="flz-box">
-            <div v-if="hide" class="flz-box flz-nospacer">
+            <div v-if="! detailVisible" class="flz-box flz-nospacer">
                 <div class="searching flz-nospacer">
                     <div class="flz-box flz-20 flz-nospacer">
                         <h1>Diplomarbeiten</h1>
                     </div>
                     <div class="flz-box flz-60 flz-nospacer">
-                        <input v-model="search" @change="searchDiploma" placeholder="search..">
+                        <input v-model="search" @change="onSearchDiploma" placeholder="search..">
                     </div>
                     <div class="flz-box flz-20 flz-nospacer">
                         <a href="#">Erweiterte Suche</a>
                     </div>
                 </div>
-                <div v-if="this.diplomaLists.length > 0">
-                    <div v-for="diplomalist in diplomaLists">
-                        <app-content v-on:changeChide="updateHide($event)" v-bind:hide="hide"
-                                     v-bind:diploma="diplomalist" v-on:detailKey="setDetailKey($event)">
+                <div v-if="this.diplomaList.length > 0">
+                    <div v-for="diploma in diplomaList">
+                        <app-content :diploma="diploma"
+                                     @onSelectDiploma="onSelectDiploma($event)">
                         </app-content>
                     </div>
                 </div>
             </div>
-            <div v-else-if="hide === false" class="flz-box flz-nospacer border">
-                <app-details v-on:changeChide="updateHide($event)"
-                             v-bind:diploma="diplomaLists[this.idDetail - 1]"
-                             v-on:detailKey="setDetailKey($event)"
-                             v-on:deleteDiploma="deleteDiploma($event)">
+            <div v-else-if="detailVisible" class="flz-box flz-nospacer border">
+                <app-details :diploma="selectedDiploma"
+                             @onDeleteDiploma="onDeleteDiploma($event)"
+                             @onCancelCreateDiploma="onCancelCreateDiploma">
                 </app-details>
             </div>
         </div>
@@ -45,80 +44,73 @@
         data() {
             return {
                 search: "",
-                diplomaLists: [],
-                hide: true,
-                idDetail: 0,
+                diplomaList: [],
+                detailVisible: false,
                 searchedDiploma: [],
-                searchedDiplomaResults: []
+                searchedDiplomaResults: [],
+                selectedDiploma: {}
             }
         },
         methods: {
-            updateHide: function (hide) {
-                this.hide = hide
+            onSelectDiploma(diploma) {
+                this.selectedDiploma = diploma;
+                this.detailVisible = true;
             },
-            setDetailKey: function (setDetailKey) {
-                this.idDetail = setDetailKey
-                console.log(this.idDetail)
+            onBackToList() {
+                this.detailVisible = false;
             },
-            postSave: function (e) {
-                axios.post('diplomarbeitsarchiv/diplomarbeiten', this.diplomaLists[e - 1])
-                    .then(function (response) {
-                        console.log(response);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            },
-            addDiploma: function () {
-                this.diplomaLists.push({
-                    "id": "",
+            onCreateDiploma() {
+                this.selectedDiploma = {
+                    "id": null,
                     "title": "",
-                    "authors": "",
-                    "tutors": "",
-                    "department": "",
+                    "authors": [],
+                    "tutors": [],
+                    "departments": [],
                     "year": "",
                     "upload": "",
-                    "summary": "",
-                    "notes": "",
+                    "summary": [],
+                    "notes": [],
                     "attachments": "",
-                    "tags": ""
-                });
-                this.idDetail = this.diplomaLists.length;
-                this.hide = !this.hide;
+                    "tags": []
+                };
+                this.detailVisible = true;
             },
-            deleteDiploma: function (e) {
-                axios.post('/diplomarbeitsarchiv/api/diplomarbeiten', this.diplomaLists[e - 1])
-                    .then(function (response) {
-                        console.log(response);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-                this.diplomaLists.splice((e - 1), 1)
-                this.hide = !this.hide
-                alert("You have deleted your Diploma data")
-            },
-            searchDiploma: function () {
-                var key
-                var results = []
-                for (var i = 0; i <= (this.diplomaLists.length - 1); i++) {
-                    key = Object.values(this.diplomaLists[i])
+            onSearchDiploma() {
+                let key;
+                let results = [];
+                for (let i = 0; i <= (this.diplomaList.length - 1); i++) {
+                    key = Object.values(this.diplomaList[i]);
                     if (((key.join()).indexOf(this.search) + 1) > 0) {
                         results.push(i);
                     }
                 }
-                this.searchedDiploma = results.join('')
+                this.searchedDiploma = results.join('');
                 axios.post('/diplomarbeitsarchiv/api/diplomarbeiten', this.searchedDiploma)
                     .then(response => {
-                    })
+                        // TODO
+                    });
                 return this.searchedDiploma
             },
+            onDeleteDiploma(e) {
+                axios.post('/diplomarbeitsarchiv/api/diplomarbeiten', this.selectedDiploma)
+                    .then(function (response) {
+                        console.log(response);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                this.diplomaList.splice((e - 1), 1);
+                this.detailVisible = false;
+            },
+            onCancelCreateDiploma() {
+                this.detailVisible = false;
+            }
         },
-        beforeCreate: function () {
+        beforeCreate() {
+            // Get initial list of diplomas
             axios.get('/diplomarbeitsarchiv/api/diplomarbeiten')
                 .then(response => {
-                    // JSON responses are automatically parsed.
-                    this.diplomaLists = response.data;
+                    this.diplomaList = response.data;
                 })
                 .catch(function (error) {
                     console.log(error);

@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="large-12 medium-12 small-12 cell">
-            <input type="file" id="files" ref="files" multiple v-on:change="handleFileUpload()" :readonly="readonly"/>
+            <input type="file" id="files" ref="files" multiple v-on:change="handleFileUpload()" :disabled="readonly"/>
             <button v-on:click="submitFiles()" :disabled="readonly">Submit</button>
         </div>
     </div>
@@ -31,7 +31,7 @@
                     let file = this.files[i];
                     formData.append('files[' + i + ']', file);
                 }
-                axios.post('/diplomarbeitsarchiv/uploads', formData, {headers: {'Content-Type': 'multipart/form-data'}})
+                axios.post('/diplomarbeitsarchiv/api/uploads', formData, {headers: {'Content-Type': 'multipart/form-data'}})
                     .then(function () {
                         console.log('SUCCESS!!');
                     })

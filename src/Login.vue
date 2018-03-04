@@ -48,15 +48,14 @@
                 newPassword2: "",
                 loggedIn: false,
                 lastUsedByMe: "",
-                users: [],
                 register: false
             }
         },
         methods: {
             login: function () {
-                this.users[0].email = this.email;
-                this.users[0].password = this.password;
-                axios.post('/diplomarbeitsarchiv/api/login', JSON.stringify(this.users[0]))
+                let user = {id: null, name: this.newEmail, password: this.password};
+                // TODO repeated PW, repeated Mailadress
+                axios.post('/diplomarbeitsarchiv/api/login', user)
                     .then(response => {
                         if (response.data === 1) {
                             console.log("session1")
@@ -70,10 +69,9 @@
                     });
             },
             registerNew() {
-                this.register = false
-                this.users[0].email = this.newEmail;
-                this.users[0].password = this.newPassword;
-                axios.post('/diplomarbeitsarchiv/api/register', JSON.stringify(this.users[0]))
+                this.register = false;
+                let user = {id: null, name: this.newEmail, password: this.password};
+                axios.post('/diplomarbeitsarchiv/api/register', user)
                     .then(response => {
                         console.log(response)
                     })
@@ -83,16 +81,6 @@
                 this.register = false;
             }
         },
-        beforeCreate: function () {
-            axios.get('/diplomarbeitsarchiv/api/users')
-                .then(response => {
-                    // JSON responses are automatically parsed.
-                    this.users = response.data;
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
-        }
     }
 </script>
 <style scoped>

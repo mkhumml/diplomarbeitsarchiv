@@ -1971,9 +1971,6 @@ legend {
 .contentArticle h2 {
   border-bottom: 1px solid black;
 }
-.details input {
-  width: 100%;
-}
 .details input[readonly] {
   opacity: 0.5;
 }

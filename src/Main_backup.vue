@@ -51,8 +51,8 @@
         data() {
             return {
                 search: "",
-                diplomaLists: [],
-                hide: true,
+                diplomaList: [],
+                detailVisible: true,
                 idDetail: 0,
                 searchedDiploma: [],
                 searchedDiplomaResults: [{}]
@@ -60,7 +60,7 @@
         },
         methods: {
             updateHide: function (updatedHide) {
-                this.hide = updatedHide
+                this.detailVisible = updatedHide
             },
             setDetailKey: function (setDetailKey) {
                 this.idDetail = setDetailKey
@@ -68,7 +68,7 @@
             },
             postSave: function (e) {
                 axios.post('http://localhost:80/diplomarbeitsarchiv/service.php', {
-                    diploma: this.diplomaLists[e - 1]
+                    diploma: this.diplomaList[e - 1]
                 })
                     .then(function (response) {
                         console.log(response);
@@ -77,23 +77,23 @@
                         console.log(error);
                     });
             },
-            addDiploma: function () {
-                this.diplomaLists.push({
-                    "id": (this.diplomaLists.length + 1),
-                    "title": "diplomarbeitstitel" + (this.diplomaLists.length + 1),
-                    "author": "diplomarbeitsauthor" + (this.diplomaLists.length + 1),
-                    "tutor": "diplomarbeitstutor" + (this.diplomaLists.length + 1),
-                    "department": "fachabteilung" + (this.diplomaLists.length + 1),
-                    "year": "jahr" + (this.diplomaLists.length + 1),
-                    "upload": "diplomathesispdf" + (this.diplomaLists.length + 1),
-                    "summary": "loremipsum" + (this.diplomaLists.length + 1),
-                    "notes": "notes" + (this.diplomaLists.length + 1),
-                    "attachments": "attachments" + (this.diplomaLists.length + 1),
-                    "tags": "tags" + (this.diplomaLists.length + 1)
+            onCreateDiploma: function () {
+                this.diplomaList.push({
+                    "id": (this.diplomaList.length + 1),
+                    "title": "diplomarbeitstitel" + (this.diplomaList.length + 1),
+                    "author": "diplomarbeitsauthor" + (this.diplomaList.length + 1),
+                    "tutor": "diplomarbeitstutor" + (this.diplomaList.length + 1),
+                    "department": "fachabteilung" + (this.diplomaList.length + 1),
+                    "year": "jahr" + (this.diplomaList.length + 1),
+                    "upload": "diplomathesispdf" + (this.diplomaList.length + 1),
+                    "summary": "loremipsum" + (this.diplomaList.length + 1),
+                    "notes": "notes" + (this.diplomaList.length + 1),
+                    "attachments": "attachments" + (this.diplomaList.length + 1),
+                    "tags": "tags" + (this.diplomaList.length + 1)
                 });
                 alert("You have added new diploma data")
                 axios.post('http://localhost:80/diplomarbeitsarchiv/service.php', {
-                    diploma: this.diplomaLists[this.diplomaLists.length - 1]
+                    diploma: this.diplomaList[this.diplomaList.length - 1]
                 })
                     .then(function (response) {
                         console.log(response);
@@ -102,9 +102,9 @@
                         console.log(error);
                     });
             },
-            deleteDiploma: function (e) {
+            onDeleteDiploma: function (e) {
                 axios.post('http://localhost:80/diplomarbeitsarchiv/service.php', {
-                    diploma: this.diplomaLists[e - 1]
+                    diploma: this.diplomaList[e - 1]
                 })
                     .then(function (response) {
                         console.log(response);
@@ -112,15 +112,15 @@
                     .catch(function (error) {
                         console.log(error);
                     });
-                this.diplomaLists.splice((e - 1), 1)
-                this.hide = !this.hide
+                this.diplomaList.splice((e - 1), 1)
+                this.detailVisible = !this.detailVisible
                 alert("You have deleted your Diploma data")
             },
-            searchDiploma: function () {
+            onSearchDiploma: function () {
                 var key
                 var results = []
-                for (var i = 0; i <= (this.diplomaLists.length - 1); i++) {
-                    key = Object.values(this.diplomaLists[i])
+                for (var i = 0; i <= (this.diplomaList.length - 1); i++) {
+                    key = Object.values(this.diplomaList[i])
                     if (((key.join()).indexOf(this.search) + 1) > 0) {
                         results.push(i);
                     }
@@ -134,9 +134,9 @@
             axios.get('/diplomarbeitsarchiv/services.php')
                 .then(response => {
                     // JSON responses are automatically parsed.
-                    console.log(this.diplomaLists);
-                    this.diplomaLists = response.data;
-                    console.log(this.diplomaLists);
+                    console.log(this.diplomaList);
+                    this.diplomaList = response.data;
+                    console.log(this.diplomaList);
                 })
                 .catch(function (error) {
                     console.log(error);
