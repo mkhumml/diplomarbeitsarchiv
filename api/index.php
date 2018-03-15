@@ -3,14 +3,14 @@
  * Multiselect Listen in der Datenbank - Prüfen ob der Eintrag noch irgenwo Verwendet wird, wenn nicht in der DB löschen
  */
 require 'flight/Flight.php';
-$servername = "localhost"; //MySQL Daten
-$user = "root";
-$pw = "root";
-$db = "diplomarbeitsarchiv";
-
 /**
  * Get list of diplomas.
  */
+Flight::register('db', 'PDO', array('mysql:host=localhost;port=3306;dbname=diplomarbeitsarchiv', 'root', 'root'), function($db) {
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+});
+
+
 Flight::route('GET /diplomarbeiten', function () {
     $authors[] = array('id' => "3", 'firstname' => 'Stefan', 'lastname' => 'Matl');
     $authors[] = array('id' => "4", 'firstname' => 'Paul', 'lastname' => 'Ortner');
@@ -22,7 +22,7 @@ Flight::route('GET /diplomarbeiten', function () {
     $tags[] = array('id' => "1", 'name' => 'Javascript');
     $tags[] = array('id' => "2", 'name' => 'HTML');
     $summary = 'SUMMARYLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.';
-    $notes = 'SUMMARYLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.';
+    $notes = 'NOTESLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.';
     $diploma[] = array('id' => 6, 'title' => "title1", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr1", 'upload' => "diplomathesispdf1", 'summary' => $summary, 'notes' => $notes, 'attachments' => "attachments1", 'tags' => $tags);
     $diploma[] = array('id' => 5, 'title' => "title2", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr2", 'upload' => "diplomathesispdf2", 'summary' => $summary, 'notes' => $notes, 'attachments' => "attachments2", 'tags' => $tags);
     $diploma[] = array('id' => 4, 'title' => "title3", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr3", 'upload' => "diplomathesispdf3", 'summary' => $summary, 'notes' => $notes, 'attachments' => "attachments3", 'tags' => $tags);
@@ -114,26 +114,23 @@ Flight::route('POST /diplomarbeiten', function () {
     echo json_encode($diploma);
 });
 
-/*
+
 Flight::route('POST /login', function () {
+    $conn = Flight::db();
+
     $json = file_get_contents("php://input");
-    $users = json_decode($json, true);
+    $user = json_decode($json, true);
+    $email = $user["email"];
+    $password = $user["password"];
 
-        $password = hash("sha512",$users["password"] );
-        $email = $users["email"];
+    $data = $conn->query("SELECT * FROM user WHERE email LIKE '$email' AND password LIKE '$password'");
 
-        $sql = "SELECT * FROM users WHERE email ='" . $email . "' AND passwort ='" . $password . "'"; //SQL Statement zum suchen aller Einträge die mit der eingegebenen email übereinstimmen
-        $res = $conn->query($sql);
-        if ($res->num_rows > 0) { // Wenn Die Anzahl der rows größer als 0 ist, gibt es ein Eintrag in der DB und somit login :)
-            $_SESSION["login"] = 1; // Session Variable login wird auf 1 gesetzt wenn user erfolgreich eingeloggt sonst ist sie 0
-            echo($_SESSION["login"]);
-        } else {
-            $_SESSION["login"] = 0;
-            echo($_SESSION["login"]);
-        }
+    if($data->fetchColumn() > 0 ){
+        echo ("hee");
+    }
 
 });
-*/
+
 
 Flight::route('POST /register', function () {
     $errorv = false;  //Errorvariable wird bei Fehler gesetzt
@@ -143,9 +140,11 @@ Flight::route('POST /register', function () {
     $email = $users["email"];
     $password = $users["password"];
     //$password2 = $users["password2"];
-    $password = hash("sha512", $users["password"]);
-    //$password2 = hash("sha512", $users["password2"]);
+    //$password = hash("sha512", $users["password"]);
+    echo($email);
     echo($password);
+    //$password2 = hash("sha512", $users["password2"]);
+    //echo($password);
     //Variable für Fehler
     /*
     if ($password != $password2) { //Überprüfe ob Passwörter übereinstimmen

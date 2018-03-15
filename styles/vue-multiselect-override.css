@@ -1,0 +1,14 @@
+.multiselect, .multiselect__tags-wrap {
+    padding: 0;
+}
+
+.multiselect__tags {
+    border-radius: unset;
+    border-color: #aaa;
+}
+
+.flz-form input.multiselect__input {
+    background-color: transparent;
+    border: none;
+}
+

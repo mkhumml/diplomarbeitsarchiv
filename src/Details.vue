@@ -1,38 +1,46 @@
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+<style src="../styles/vue-multiselect-override.css"></style>
 <template>
-    <div class="flz-box flz-form details">
+    <div class="flz-box flz-form flz-nospacer details">
         <div class="flz-box flz-66 flz-nospacer">
             <div class="flz-box">
-                <h1>Title</h1>
-                <input type="text" v-model="diploma.title" :readonly="readonly">
+                <label for="title">Title</label>
+                <input id="title" type="text" v-model="diploma.title" :readonly="readonly">
             </div>
             <div class="flz-box flz-50">
-                <h1>Authors</h1>
-                <multiselect v-model="diploma.authors"
-                             :custom-label="showAuthor"
-                             :close-on-select="true"
-                             :disabled="readonly"
-                             :hide-selected="true"
-                             :multiple="true"
-                             :options="optionsAuthors"
-                             selectLabel=""
-                             track-by="id"
-                             :taggable="true"
-                             @tag="addAuthor">
+                <label>Authors</label>
+                <multiselect
+                        placeholder="Firstname / Lastname"
+                        tagPlaceholder="Firstname / Lastname"
+                        v-model="diploma.authors"
+                        :custom-label="showAuthor"
+                        :close-on-select="true"
+                        :disabled="readonly"
+                        :hide-selected="true"
+                        :multiple="true"
+                        :options="optionsAuthors"
+                        selectLabel=""
+                        track-by="id"
+                        :taggable="true"
+                        @tag="addAuthor">
                 </multiselect>
             </div>
             <div class="flz-box flz-50">
-                <h1>Tutors</h1>
-                <multiselect v-model="diploma.tutors"
-                             :custom-label="showTutor"
-                             :close-on-select="true"
-                             :disabled="readonly"
-                             :hide-selected="true"
-                             :multiple="true"
-                             :options="optionsTutors"
-                             selectLabel=""
-                             track-by="id"
-                             :taggable="true"
-                             @tag="addTutor">
+                <label>Tutors</label>
+                <multiselect
+                        placeholder="Firstname / Lastname"
+                        tagPlaceholder="Firstname / Lastname"
+                        v-model="diploma.tutors"
+                        :custom-label="showTutor"
+                        :close-on-select="true"
+                        :disabled="readonly"
+                        :hide-selected="true"
+                        :multiple="true"
+                        :options="optionsTutors"
+                        selectLabel=""
+                        track-by="id"
+                        :taggable="true"
+                        @tag="addTutor">
                 </multiselect>
             </div>
         </div>
@@ -40,7 +48,7 @@
             <img src="images/Download.jpeg">
         </div>
         <div class="flz-box flz-50">
-            <h1>Department</h1>
+            <label>Department</label>
             <multiselect v-model="diploma.departments"
                          :close-on-select="true"
                          :disabled="readonly"
@@ -56,16 +64,11 @@
         </div>
         <div class="flz-box flz-50 flz-nospacer">
             <div class="flz-box flz-33">
-                <h1>Year</h1>
-                <multiselect v-model="diploma.year"
-                             :disabled="readonly"
-                             :options="optionsYears"
-                             selectLabel=""
-                             track-by="id">
-                </multiselect>
+                <label>Year</label>
+                <input type="text" v-model="year" :readonly="readonly">
             </div>
             <div class="flz-box flz-66">
-                <h1>Diplomathesis</h1>
+                <label>Diplomathesis</label>
                 <!--<vue-clip :options="options">
                     <template slot="clip-uploader-action">
                         <div class="uploader-action flz-nospacer">
@@ -86,20 +89,20 @@
             </div>
         </div>
         <div class="flz-box flz-33">
-            <h1>Summary</h1>
-            <textarea v-model="diploma.summary" :disabled="readonly">{{diploma.summary}}</textarea>
+            <label>Summary</label>
+            <textarea rows="10" v-model="diploma.summary" :disabled="readonly">{{diploma.summary}}</textarea>
         </div>
         <div class="flz-box flz-33">
-            <h1>Notes</h1>
-            <textarea v-model="diploma.notes" :disabled="readonly">{{diploma.notes}}</textarea>
+            <label>Notes</label>
+            <textarea rows="10" v-model="diploma.notes" :disabled="readonly">{{diploma.notes}}</textarea>
         </div>
         <div class="flz-box flz-33">
-            <h1>Attachments</h1>
+            <label>Attachments</label>
             <!-- FIXME Show links instead to be able to download the files -->
             <input :value="diploma.attachments" :readonly="readonly">
         </div>
         <div class="flz-box">
-            <h1>Tags</h1>
+            <label>Tags</label>
             <multiselect v-model="diploma.tags"
                          :disabled="readonly"
                          :hide-selected="true"
@@ -123,6 +126,11 @@
 
 <script>
     import Upload from './Upload.vue'
+    //TODO: reset password withTask of undefined
+    //TODO: register withTask of undefined
+    //TODO: Dropdown styling & pflichtfelder & maximalanzeige & sortieren
+    //TODO: upload
+    //TODO: responsive Design & Design
 
     export default {
         components: {
@@ -153,11 +161,6 @@
                 optionsDepartments: [],
                 optionsTags: [],
                 optionsTutors: [],
-                optionsYears: [
-                    2018,
-                    2017,
-                    2016
-                ],
                 readonly: true,
             }
         },
@@ -184,7 +187,7 @@
                     this.diploma.authors.push(author);
                     console.log("successAddAuthor")
                 }
-                else if(parts.length > 2) {
+                else if (parts.length > 2) {
                     console.log("You need to add firstname and lastname")
                 }
             },
@@ -196,7 +199,7 @@
                     this.diploma.tutors.push(tutor);
                     console.log("successAddTutor")
                 }
-                else if(parts.length > 2) {
+                else if (parts.length > 2) {
                     console.log("You need to add firstname and lastname")
                 }
             },
@@ -226,6 +229,7 @@
             onSave() {
                 axios.post('/diplomarbeitsarchiv/api/diplomarbeiten/', this.diploma)
                     .then(response => {
+                        console.log(this.diploma)
                         this.diploma.title = response.data.title;
                         this.diploma.authors = response.data.authors;
                         this.diploma.tutors = response.data.tutors;
@@ -294,6 +298,4 @@
     }
 
 </script>
-
-<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <style scoped></style>

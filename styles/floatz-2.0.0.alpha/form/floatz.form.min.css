@@ -154,31 +154,50 @@ body {
   height: 0;
   visibility: hidden;
 }
-.flz-form input[type=text],
-.flz-form input[type=password],
+.flz-form input,
 .flz-form select,
 .flz-form textarea {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
   border: 1px solid #aaa;
   display: block;
   height: 2rem;
   width: 100%;
 }
+.flz-form input[readonly],
+.flz-form select[readonly],
+.flz-form textarea[readonly],
+.flz-form input[disabled],
+.flz-form select[disabled],
+.flz-form textarea[disabled] {
+  background-color: #eee;
+  color: #aaa;
+}
 .flz-form label {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
   display: block;
-  padding: 0 0 0.5rem 0;
   width: 100%;
+}
+.flz-form input[type=button],
+.flz-form input[type=submit],
+.flz-form input[type=reset] {
+  display: inline-block;
+  height: auto;
+  width: auto;
+}
+.flz-form input[type=radio],
+.flz-form input[type=checkbox] {
+  display: inline-block;
+  height: auto;
+  width: auto;
 }
 .flz-form input[type=radio] + label,
 .flz-form input[type=checkbox] + label {
   display: inline-block;
-  padding: 0 0.5rem 0 0;
+  padding-left: 0.25rem;
+  padding-right: 1rem;
   width: auto;
+}
+.flz-form input[type=radio][disabled] + label,
+.flz-form input[type=checkbox][disabled] + label {
+  color: #aaa;
 }
 .flz-form textarea {
   height: auto;

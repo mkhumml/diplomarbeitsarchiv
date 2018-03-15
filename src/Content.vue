@@ -12,7 +12,7 @@
                             {{showTutors(diploma.tutors)}}</h2>
                     </div>
                     <div class="flz-box flz-10 flz-nospacer">
-                        <button @click="collapsed = !collapsed">Show</button>
+                        <button @dblclick="onViewDiploma" @click="collapsed = !collapsed">Show</button>
                     </div>
                 </div>
                 <div v-show="collapsed" class="flz-box flz-100 article flz-nospacer">

@@ -32,12 +32,18 @@ blockquote, q {
 
 blockquote:before, blockquote:after,
 q:before, q:after {
-//	content: '';
+	//	content: '';
 	content: none;
 }
 
 input {
 	overflow: hidden; // Prevent borders outside of line height
+}
+
+input[type=checkbox],
+input[type=radio] {
+	vertical-align: text-top;
+	margin: 0;
 }
 
 textarea {

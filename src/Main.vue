@@ -1,9 +1,10 @@
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <template>
     <div id="main" class="flz-box flz-75">
-        <button v-show="detailVisible" v-on:click="onBackToList">Back to list</button>
-        <button v-show="!detailVisible" v-on:click="onCreateDiploma">Create New</button>
-        <div class="flz-box">
-            <div v-if="! detailVisible" class="flz-box flz-nospacer">
+        <button v-show="detailVisible" @click="onBackToList">Back to list</button>
+        <button v-show="!detailVisible" @click="onCreateDiploma">Create New</button>
+        <div class="flz-box flz-nospacer">
+            <div v-if="!detailVisible" class="flz-box flz-nospacer">
                 <div class="searching flz-nospacer">
                     <div class="flz-box flz-20 flz-nospacer">
                         <h1>Diplomarbeiten</h1>
@@ -12,7 +13,64 @@
                         <input v-model="search" @change="onSearchDiploma" placeholder="search..">
                     </div>
                     <div class="flz-box flz-20 flz-nospacer">
-                        <a href="#">Erweiterte Suche</a>
+                        <a @click="extendedFilter = !extendedFilter" v-if="extendedFilter === false">Erweiterte
+                            Suche</a>
+                        <a @click="extendedFilter = !extendedFilter" v-if="extendedFilter === true">Verstecke Erweiterte
+                            Suche</a>
+                    </div>
+                    <div v-if="extendedFilter === true" class="flz-box flz-nospacer">
+                        <div class="flz-box flz-20 flz-nospacer">
+                            <input type="text" v-model="searchedYear">
+                        </div>
+                        <div class="flz-box flz-20 flz-nospacer">
+                            <multiselect
+                                    v-model="searchedAuthors"
+                                    :custom-label="showAuthor"
+                                    :close-on-select="true"
+                                    :hide-selected="true"
+                                    :multiple="true"
+                                    :options="optionsAuthors"
+                                    selectLabel=""
+                                    track-by="id">
+                            </multiselect>
+                        </div>
+                        <div class="flz-box flz-20 flz-nospacer">
+                            <multiselect
+                                    v-model="searchedTutors"
+                                    :custom-label="showTutor"
+                                    :close-on-select="true"
+                                    :hide-selected="true"
+                                    :multiple="true"
+                                    :options="optionsTutors"
+                                    selectLabel=""
+                                    track-by="id">
+                            </multiselect>
+                        </div>
+                        <div class="flz-box flz-20 flz-nospacer">
+                            <multiselect
+                                    label="name"
+                                    v-model="searchedDepartments"
+                                    :close-on-select="true"
+                                    :hide-selected="true"
+                                    :multiple="true"
+                                    :options="optionsDepartments"
+                                    selectLabel=""
+                                    track-by="id">
+                            </multiselect>
+                        </div>
+                        <div class="flz-box flz-20 flz-nospacer">
+                            <multiselect
+                                    label="name"
+                                    v-model="searchedTags"
+                                    :close-on-select="true"
+                                    :hide-selected="true"
+                                    :multiple="true"
+                                    :options="optionsTags"
+                                    selectLabel=""
+                                    track-by="id">
+                            </multiselect>
+                        </div>
+                        <button @click="onExtendedFilter">Erweiterte Sucheinstellungen aktivieren</button>
                     </div>
                 </div>
                 <div v-if="this.diplomaList.length > 0">
@@ -44,14 +102,29 @@
         data() {
             return {
                 search: "",
+                searchedDiploma: [],
                 diplomaList: [],
                 detailVisible: false,
-                searchedDiploma: [],
-                searchedDiplomaResults: [],
-                selectedDiploma: {}
+                selectedDiploma: {},
+                optionsAuthors: [],
+                optionsTutors: [],
+                optionsDepartments: [],
+                optionsTags: [],
+                extendedFilter: false,
+                searchedAuthors: [],
+                searchedTutors: [],
+                searchedDepartments: [],
+                searchedTags: [],
+                searchedYear: ""
             }
         },
         methods: {
+            showAuthor(author) {
+                return `${author.firstname} ${author.lastname}`;
+            },
+            showTutor(tutor) {
+                return `${tutor.firstname} ${tutor.lastname}`;
+            },
             onSelectDiploma(diploma) {
                 this.selectedDiploma = diploma;
                 this.detailVisible = true;
@@ -76,20 +149,33 @@
                 this.detailVisible = true;
             },
             onSearchDiploma() {
-                let key;
-                let results = [];
-                for (let i = 0; i <= (this.diplomaList.length - 1); i++) {
-                    key = Object.values(this.diplomaList[i]);
-                    if (((key.join()).indexOf(this.search) + 1) > 0) {
-                        results.push(i);
-                    }
-                }
-                this.searchedDiploma = results.join('');
+                axios.post('/diplomarbeitsarchiv/api/diplomarbeiten', this.search)
+                    .then(response => {
+                        this.diplomaList = response.data;
+                    });
+            },
+            onExtendedFilter() {
+                this.searchedDiploma = {
+                    "id": null,
+                    "authors": [],
+                    "tutors": [],
+                    "departments": [],
+                    "year": "",
+                    "tags": []
+                };
+                this.searchedDiploma.authors.push(this.searchedAuthors);
+                this.searchedDiploma.tutors.push(this.searchedTutors);
+                this.searchedDiploma.departments.push(this.searchedDepartments);
+                this.searchedDiploma.tags.push(this.searchedTags);
+                this.searchedDiploma.year = this.searchedYear;
                 axios.post('/diplomarbeitsarchiv/api/diplomarbeiten', this.searchedDiploma)
                     .then(response => {
-                        // TODO
-                    });
-                return this.searchedDiploma
+                        console.log(this.searchedDiploma)
+                        console.log(response)
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    })
             },
             onDeleteDiploma(e) {
                 axios.post('/diplomarbeitsarchiv/api/diplomarbeiten', this.selectedDiploma)
@@ -111,6 +197,38 @@
             axios.get('/diplomarbeitsarchiv/api/diplomarbeiten')
                 .then(response => {
                     this.diplomaList = response.data;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            axios.get('/diplomarbeitsarchiv/api/authors')
+                .then(response => {
+                    // JSON responses are automatically parsed.
+                    this.optionsAuthors = response.data;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            axios.get('/diplomarbeitsarchiv/api/tutors')
+                .then(response => {
+                    // JSON responses are automatically parsed.
+                    this.optionsTutors = response.data;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            axios.get('/diplomarbeitsarchiv/api/departments')
+                .then(response => {
+                    // JSON responses are automatically parsed.
+                    this.optionsDepartments = response.data;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            axios.get('/diplomarbeitsarchiv/api/tags')
+                .then(response => {
+                    // JSON responses are automatically parsed.
+                    this.optionsTags = response.data;
                 })
                 .catch(function (error) {
                     console.log(error);
