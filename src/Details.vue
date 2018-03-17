@@ -1,5 +1,5 @@
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
-<style src="../styles/vue-multiselect-override.css"></style>
+<style src="../styles/vue-multiselect-override.min.css"></style>
 <template>
     <div class="flz-box flz-form flz-nospacer details">
         <div class="flz-box flz-66 flz-nospacer">
@@ -71,39 +71,34 @@
                 <input id="year" type="text" v-model="diploma.year" :readonly="readonly">
             </div>
             <div class="flz-box flz-66">
-                <label>Diplomathesis</label>
-                <!--<vue-clip :options="options">
-                    <template slot="clip-uploader-action">
-                        <div class="uploader-action flz-nospacer">
-                            <div class="dz-message flz-nospacer">Upload Pdf vhere</div>
-                        </div>
-                    </template>
-                    <template slot="clip-uploader-body" scope="props">
-                        <div class="uploader-files">
-                            <div v-for="file in props.file">
-                                <img v-bind:src="file.dataUrl"/>
-                                <p>{{ file.name }} {{ file.status }}</p>
-                            </div>
-                        </div>
-                    </template>
-                </vue-clip>-->
-                <app-upload :readonly="readonly">
-                </app-upload>
+                <label for="diplomarbeit">Diplomarbeit</label>
+                <div v-if="diploma.upload.tmp_name !== null" class="flz-box attachments">
+                    <a v-bind:href="diploma.upload.tmp_name" target="_blank">{{diploma.upload.name}}</a>
+                </div>
+                <input id="diplomarbeit" type="file" id="file" value="" ref="diploma" v-on:change="onDiplomaSelected"
+                       :disabled="readonly"/>
             </div>
         </div>
-        <div class="flz-box flz-33">
-            <label for="summary">Summary</label>
-            <textarea id="summary" rows="10" v-model="diploma.summary"
-                      :disabled="readonly">{{diploma.summary}}</textarea>
-        </div>
-        <div class="flz-box flz-33">
-            <label for="notes">Notes</label>
-            <textarea id="notes" rows="10" v-model="diploma.notes" :disabled="readonly">{{diploma.notes}}</textarea>
-        </div>
-        <div class="flz-box flz-33">
-            <label for="attachments">Attachments</label>
-            <!-- FIXME Show links instead to be able to download the files -->
-            <input id="attachments" :value="diploma.attachments" :readonly="readonly">
+        <div class="flz-box flz-nospacer">
+            <div class="flz-box flz-33">
+                <label for="summary">Summary</label>
+                <textarea id="summary" rows="10" v-model="diploma.summary"
+                          :disabled="readonly">{{diploma.summary}}</textarea>
+            </div>
+            <div class="flz-box flz-33">
+                <label for="notes">Notes</label>
+                <textarea id="notes" rows="10" v-model="diploma.notes" :disabled="readonly">{{diploma.notes}}</textarea>
+            </div>
+            <div class="flz-box flz-33">
+                <label>Attachments</label>
+                <ul class="attachments">
+                    <li v-for="attachment in diploma.attachments">
+                        <a v-bind:href="attachment.tmp_name" target="_blank">{{attachment.name}}</a>
+                    </li>
+                </ul>
+                <input type="file" id="files" value="" ref="attachments" multiple v-on:change="onAttachmentSelected"
+                       :disabled="readonly"/>
+            </div>
         </div>
         <div class="flz-box">
             <label for="tags">Tags</label>
@@ -130,7 +125,6 @@
 </template>
 
 <script>
-    import Upload from './Upload.vue'
     //TODO: reset password withTask of undefined
     //TODO: register withTask of undefined
     //TODO: Dropdown styling & pflichtfelder & maximalanzeige & sortieren
@@ -138,9 +132,6 @@
     //TODO: responsive Design & Design
 
     export default {
-        components: {
-            'app-upload': Upload
-        },
         props: {
             diploma: {
                 type: Object,
@@ -167,6 +158,8 @@
                 optionsTags: [],
                 optionsTutors: [],
                 readonly: true,
+                attachments: [],
+                diplomaFile: ""
             }
         },
         methods: {
@@ -232,9 +225,18 @@
                 this.setReadonly(false);
             },
             onSave() {
-                axios.post('/diplomarbeitsarchiv/api/diplomarbeiten/', this.diploma)
+                let formData = new FormData();
+                if (this.diplomaFile !== null) {
+                    formData.append("diplomaFile", this.diplomaFile);
+                }
+                if (this.attachments.length > 0) {
+                    for (let i = 0; i < this.attachments.length; i++) {
+                        formData.append('attachments[' + i + ']', this.attachments[i]);
+                    }
+                }
+                formData.append("diploma", JSON.stringify(this.diploma));
+                axios.post('/diplomarbeitsarchiv/api/diplomarbeiten/', formData, {headers: {'Content-Type': 'multipart/form-data'}})
                     .then(response => {
-                        console.log(this.diploma)
                         this.diploma.title = response.data.title;
                         this.diploma.authors = response.data.authors;
                         this.diploma.tutors = response.data.tutors;
@@ -245,9 +247,12 @@
                         this.diploma.notes = response.data.notes;
                         this.diploma.attachments = response.data.attachments;
                         this.diploma.tags = response.data.tags;
+                        this.$refs.diploma.value = null;
+                        this.$refs.attachments.value = null;
                         this.setReadonly(true);
                     })
                     .catch(function (error) {
+                        // FIXME Show all AJAX errors in UI and not in browser console
                         console.log(error);
                     });
             },
@@ -260,6 +265,12 @@
                         console.log(error);
                     });
             },
+            onDiplomaSelected: function () {
+                this.diplomaFile = this.$refs.diploma.files[0];
+            },
+            onAttachmentSelected: function () {
+                this.attachments = this.$refs.attachments.files;
+            }
         },
         created() {
             axios.get('/diplomarbeitsarchiv/api/authors')

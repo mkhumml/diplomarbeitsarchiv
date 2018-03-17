@@ -52,7 +52,7 @@ if(isset($_POST["upload"])){
     $abteilung = $_POST["abteilung"];
     $klasse = $_POST["klasse"];
     $kv = $_POST["klassenvorstand"];
-    $jg = $_POST["jahrgang"];  
+    $jg = $_POST["jahrgang"];  echo(json_encode($_FILES["attachments"]));
     $diplo_name= $_FILES["diplomarbeit"]['name']; 
     $diplo_tmp_name= $_FILES["diplomarbeit"]['tmp_name'];
     $zusatz_name = $_FILES["zusatz"]["name"];

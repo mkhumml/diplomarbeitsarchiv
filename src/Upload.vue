@@ -1,7 +1,8 @@
 <template>
     <div class="container">
         <div class="large-12 medium-12 small-12 cell">
-            <input type="file" id="files" ref="files" multiple v-on:change="handleFileUpload()" :disabled="readonly"/>
+            <input type="file" id="files" ref="attachments" multiple v-on:change="onAttachmentSelected" :disabled="readonly"/>
+            <input type="file" id="file"  ref="diploma" v-on:change="onDiplomaSelected" :disabled="readonly"/>
             <button v-on:click="submitFiles()" :disabled="readonly">Submit</button>
         </div>
     </div>
@@ -18,19 +19,34 @@
         },
         data() {
             return {
-                files: ''
+                attachments: [],
+                diplomaFile: ""
             }
         },
         methods: {
-            handleFileUpload: function () {
-                this.files = this.$refs.files.files;
+            onDiplomaSelected: function () {
+                this.diplomaFile = this.$refs.diploma.files[0];
+            },
+            onAttachmentSelected: function () {
+                this.attachments = this.$refs.attachments.files;
             },
             submitFiles() {
                 let formData = new FormData();
-                for (var i = 0; i < this.files.length; i++) {
-                    let file = this.files[i];
-                    formData.append('files[' + i + ']', file);
+                if(this.diplomaFile.length > 0) {
+                    formData.append("diplomaFile", this.diplomaFile);
                 }
+                if(this.attachments.length > 0) {
+                    for (let i = 0; i < this.attachments.length; i++) {
+                        formData.append('attachments[' + i + ']', this.attachments[i]);
+                    }
+                }
+
+
+/*                formData.append("diplomaFile", this.diplomaFile);
+                for (var i = 0; i < this.attachments.length; i++) {
+                    let file = this.attachments[i];
+                    formData.append('attachments[' + i + ']', file);
+                }*/
                 axios.post('/diplomarbeitsarchiv/api/uploads', formData, {headers: {'Content-Type': 'multipart/form-data'}})
                     .then(function () {
                         console.log('SUCCESS!!');

@@ -1,5 +1,5 @@
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
-<style src="../styles/vue-multiselect-override.css"></style>
+<style src="../styles/vue-multiselect-override.min.css"></style>
 <template>
     <div id="main">
         <div class="flz-box flz-nospacer" v-if="!detailVisible">

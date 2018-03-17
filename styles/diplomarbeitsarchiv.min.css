@@ -4618,9 +4618,6 @@ label {
 .contentArticle h2 {
   border-bottom: 1px solid black;
 }
-.details input[readonly] {
-  opacity: 0.5;
-}
 .details img {
   height: 5em;
   width: 10em;
@@ -4665,4 +4662,12 @@ label {
 #login {
   border: 1px solid #dadada;
   background-color: #efefef;
+}
+.flz-form input,
+.attachments {
+  border: 1px solid #aaa;
+}
+.flz-form input[type=file] {
+  border: none;
+  padding: 0.5rem 0;
 }

@@ -2458,11 +2458,6 @@ label {
 }
 
 .details {
-  input {
-    &[readonly] {
-      opacity: 0.5;
-    }
-  }
   img {
     height: 5em;
     width: 10em;
@@ -2514,4 +2509,15 @@ label {
 #login {
   border: 1px solid @color-gray-mid;
   background-color: @color-gray-light;
+}
+
+.flz-form input,
+.attachments {
+  border: 1px solid @flz-var-form-border-color;
+}
+
+
+.flz-form input[type=file] {
+  border: none;
+  padding: @flz-var-gutter-text-y / 2 0;
 }

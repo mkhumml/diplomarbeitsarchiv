@@ -6,7 +6,7 @@ require 'flight/Flight.php';
 /**
  * Get list of diplomas.
  */
-Flight::register('db', 'PDO', array('mysql:host=localhost;port=3306;dbname=diplomarbeitsarchiv', 'root', 'root'), function($db) {
+Flight::register('db', 'PDO', array('mysql:host=localhost;port=3306;dbname=diplomarbeitsarchiv', 'root', 'root'), function ($db) {
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 });
 
@@ -21,23 +21,26 @@ Flight::route('GET /diplomarbeiten', function () {
     $tutors[] = array('id' => "2", 'firstname' => 'Bernhard', 'lastname' => 'Loibner');
     $tags[] = array('id' => "1", 'name' => 'Javascript');
     $tags[] = array('id' => "2", 'name' => 'HTML');
+    $attachments[] = array('id' => "1", 'name' => "Anhang1", "tmp_name" => "phpAnhang1");
+    $attachments[] = array('id' => "2", 'name' => "Anhang2", "tmp_name" => "phpAnhang2");
+    $attachments[] = array('id' => "3", 'name' => "Anhang3", "tmp_name" => "phpAnhang3");
     $summary = 'SUMMARYLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.';
     $notes = 'NOTESLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.';
-    $diploma[] = array('id' => 6, 'title' => "title1", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr1", 'upload' => "diplomathesispdf1", 'summary' => $summary, 'notes' => $notes, 'attachments' => "attachments1", 'tags' => $tags);
-    $diploma[] = array('id' => 5, 'title' => "title2", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr2", 'upload' => "diplomathesispdf2", 'summary' => $summary, 'notes' => $notes, 'attachments' => "attachments2", 'tags' => $tags);
-    $diploma[] = array('id' => 4, 'title' => "title3", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr3", 'upload' => "diplomathesispdf3", 'summary' => $summary, 'notes' => $notes, 'attachments' => "attachments3", 'tags' => $tags);
-    $diploma[] = array('id' => 3, 'title' => "title4", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr4", 'upload' => "diplomathesispdf4", 'summary' => $summary, 'notes' => $notes, 'attachments' => "attachments4", 'tags' => $tags);
-    $diploma[] = array('id' => 2, 'title' => "title5", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr5", 'upload' => "diplomathesispdf5", 'summary' => $summary, 'notes' => $notes, 'attachments' => "attachments5", 'tags' => $tags);
-    $diploma[] = array('id' => 1, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => "attachments6", 'tags' => $tags);
-    $diploma[] = array('id' => 7, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => "attachments6", 'tags' => $tags);
-    $diploma[] = array('id' => 8, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => "attachments6", 'tags' => $tags);
-    $diploma[] = array('id' => 9, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => "attachments6", 'tags' => $tags);
-    $diploma[] = array('id' => 10, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => "attachments6", 'tags' => $tags);
-    $diploma[] = array('id' => 11, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => "attachments6", 'tags' => $tags);
-    $diploma[] = array('id' => 12, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => "attachments6", 'tags' => $tags);
-    $diploma[] = array('id' => 13, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => "attachments6", 'tags' => $tags);
-    $diploma[] = array('id' => 14, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => "attachments6", 'tags' => $tags);
-    $diploma[] = array('id' => 15, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => "attachments6", 'tags' => $tags);
+    $diploma[] = array('id' => 6, 'title' => "title1", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr1", 'upload' => "diplomathesispdf1", 'summary' => $summary, 'notes' => $notes, 'attachments' => array(), 'tags' => $tags);
+    $diploma[] = array('id' => 5, 'title' => "title2", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr2", 'upload' => "diplomathesispdf2", 'summary' => $summary, 'notes' => $notes, 'attachments' => $attachments, 'tags' => $tags);
+    $diploma[] = array('id' => 4, 'title' => "title3", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr3", 'upload' => "diplomathesispdf3", 'summary' => $summary, 'notes' => $notes, 'attachments' => $attachments, 'tags' => $tags);
+    $diploma[] = array('id' => 3, 'title' => "title4", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr4", 'upload' => "diplomathesispdf4", 'summary' => $summary, 'notes' => $notes, 'attachments' => $attachments, 'tags' => $tags);
+    $diploma[] = array('id' => 2, 'title' => "title5", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr5", 'upload' => "diplomathesispdf5", 'summary' => $summary, 'notes' => $notes, 'attachments' => $attachments, 'tags' => $tags);
+    $diploma[] = array('id' => 1, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => $attachments, 'tags' => $tags);
+    $diploma[] = array('id' => 7, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => $attachments, 'tags' => $tags);
+    $diploma[] = array('id' => 8, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => $attachments, 'tags' => $tags);
+    $diploma[] = array('id' => 9, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => $attachments, 'tags' => $tags);
+    $diploma[] = array('id' => 10, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => $attachments, 'tags' => $tags);
+    $diploma[] = array('id' => 11, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => $attachments, 'tags' => $tags);
+    $diploma[] = array('id' => 12, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => $attachments, 'tags' => $tags);
+    $diploma[] = array('id' => 13, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => $attachments, 'tags' => $tags);
+    $diploma[] = array('id' => 14, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => $attachments, 'tags' => $tags);
+    $diploma[] = array('id' => 15, 'title' => "title6", 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => "jahr6", 'upload' => "diplomathesispdf6", 'summary' => $summary, 'notes' => $notes, 'attachments' => $attachments, 'tags' => $tags);
     echo json_encode($diploma);
 });
 
@@ -106,11 +109,45 @@ Flight::route('DELETE /diplomarbeiten/@id', function ($id) {
  * Save diploma (create and update)
  */
 Flight::route('POST /diplomarbeiten', function () {
-    $json = file_get_contents("php://input");
-    $diploma = json_decode($json, true);
+    $diploma = json_decode($_POST["diploma"], true);
+
+    $uploads_dir = '../uploads';
+    if (!is_dir($uploads_dir)) {
+        mkdir($uploads_dir);
+    }
+
+    // Save diploma file
+    if (array_key_exists("diplomaFile", $_FILES)) {
+        if ($_FILES["diplomaFile"]["error"] == UPLOAD_ERR_OK) {
+            $tmp_name = $_FILES["diplomaFile"]["tmp_name"];
+            $name = basename($_FILES["diplomaFile"]["tmp_name"]);
+            $ext = pathinfo($_FILES["diplomaFile"]["name"], PATHINFO_EXTENSION);
+            $name = "{$name}.{$ext}";
+            move_uploaded_file($tmp_name, "$uploads_dir/$name");
+        }
+
+        // Read file name into diploma data
+        $diploma["upload"] = array("name" => $_FILES["diplomaFile"]["name"], "tmp_name" => "./uploads/{$name}");
+    }
+
+    // Save attachments
+    if (array_key_exists("attachments", $_FILES)) {
+        $diploma["attachments"] = array();
+        foreach ($_FILES["attachments"]["error"] as $key => $error) {
+            if ($error == UPLOAD_ERR_OK) {
+                $tmp_name = $_FILES["attachments"]["tmp_name"][$key];
+                $name = basename($_FILES["attachments"]["tmp_name"][$key]);
+                $ext = pathinfo($_FILES["attachments"]["name"][$key], PATHINFO_EXTENSION);
+                $name = "{$name}.{$ext}";
+                move_uploaded_file($tmp_name, "$uploads_dir/$name");
+                // Read file name into diploma data
+                array_push($diploma["attachments"], array("id" => null, "name" => $_FILES["attachments"]["name"][$key], "tmp_name" => "./uploads/{$name}"));
+            }
+        }
+    }
 
     /*
-        if($dimploma["id"] === null) {
+        if($diploma["id"] === null) {
             // Create new diploma in db
         } else {
             // Update diploma with id in db
@@ -120,9 +157,30 @@ Flight::route('POST /diplomarbeiten', function () {
 
         // Return created/updated diploma as JSON to client
     */
-    echo json_encode($diploma);
+
+    echo(json_encode($diploma));
 });
 
+Flight::route('POST /uploads', function () {
+    $uploads_dir = '../uploads';
+    /*    if(! is_dir($uploads_dir)) {
+            mkdir($uploads_dir);
+        }
+
+        foreach ($_FILES["attachments"]["error"] as $key => $error) {
+            if ($error == UPLOAD_ERR_OK) {
+                $tmp_name = $_FILES["attachments"]["tmp_name"][$key];
+                $name = basename($_FILES["attachments"]["tmp_name"][$key]);
+                move_uploaded_file($tmp_name, "$uploads_dir/$name");
+            }
+        }
+    */
+    echo(json_encode($_FILES["diplomaFile"]));
+
+    if (array_key_exists("attachments", $_FILES)) {
+        echo(json_encode($_FILES["attachments"]));
+    }
+});
 
 Flight::route('POST /login', function () {
     $conn = Flight::db();
@@ -134,8 +192,8 @@ Flight::route('POST /login', function () {
 
     $data = $conn->query("SELECT * FROM user WHERE email LIKE '$email' AND password LIKE '$password'");
 
-    if($data->fetchColumn() > 0 ){
-        echo ("hee");
+    if ($data->fetchColumn() > 0) {
+        echo("hee");
     }
 
 });

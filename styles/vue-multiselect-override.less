@@ -1,5 +1,6 @@
 .multiselect, .multiselect__tags-wrap {
     padding: 0;
+    opacity: unset;
 }
 
 .multiselect__tags {
@@ -14,6 +15,10 @@
 
 .multiselect--disabled .multiselect__tags {
     background-color: #eee;
+
+    .multiselect__tag {
+        opacity: 0.6;
+    }
 }
 
 .multiselect--disabled .multiselect__current, .multiselect--disabled .multiselect__select, .multiselect__option--disabled {
