@@ -8,8 +8,9 @@
                 <input id="title" type="text" v-model="diploma.title" :readonly="readonly">
             </div>
             <div class="flz-box flz-50">
-                <label>Authors</label>
+                <label for="authors">Authors</label>
                 <multiselect
+                        id="authors"
                         placeholder="Firstname / Lastname"
                         tagPlaceholder="Firstname / Lastname"
                         v-model="diploma.authors"
@@ -26,8 +27,9 @@
                 </multiselect>
             </div>
             <div class="flz-box flz-50">
-                <label>Tutors</label>
+                <label for="tutors">Tutors</label>
                 <multiselect
+                        id="tutors"
                         placeholder="Firstname / Lastname"
                         tagPlaceholder="Firstname / Lastname"
                         v-model="diploma.tutors"
@@ -48,8 +50,9 @@
             <img src="images/Download.jpeg">
         </div>
         <div class="flz-box flz-50">
-            <label>Department</label>
-            <multiselect v-model="diploma.departments"
+            <label for="department">Department</label>
+            <multiselect id="department"
+                         v-model="diploma.departments"
                          :close-on-select="true"
                          :disabled="readonly"
                          :hide-selected="true"
@@ -64,8 +67,8 @@
         </div>
         <div class="flz-box flz-50 flz-nospacer">
             <div class="flz-box flz-33">
-                <label>Year</label>
-                <input type="text" v-model="year" :readonly="readonly">
+                <label for="year">Year</label>
+                <input id="year" type="text" v-model="diploma.year" :readonly="readonly">
             </div>
             <div class="flz-box flz-66">
                 <label>Diplomathesis</label>
@@ -89,21 +92,23 @@
             </div>
         </div>
         <div class="flz-box flz-33">
-            <label>Summary</label>
-            <textarea rows="10" v-model="diploma.summary" :disabled="readonly">{{diploma.summary}}</textarea>
+            <label for="summary">Summary</label>
+            <textarea id="summary" rows="10" v-model="diploma.summary"
+                      :disabled="readonly">{{diploma.summary}}</textarea>
         </div>
         <div class="flz-box flz-33">
-            <label>Notes</label>
-            <textarea rows="10" v-model="diploma.notes" :disabled="readonly">{{diploma.notes}}</textarea>
+            <label for="notes">Notes</label>
+            <textarea id="notes" rows="10" v-model="diploma.notes" :disabled="readonly">{{diploma.notes}}</textarea>
         </div>
         <div class="flz-box flz-33">
-            <label>Attachments</label>
+            <label for="attachments">Attachments</label>
             <!-- FIXME Show links instead to be able to download the files -->
-            <input :value="diploma.attachments" :readonly="readonly">
+            <input id="attachments" :value="diploma.attachments" :readonly="readonly">
         </div>
         <div class="flz-box">
-            <label>Tags</label>
-            <multiselect v-model="diploma.tags"
+            <label for="tags">Tags</label>
+            <multiselect id="tags"
+                         v-model="diploma.tags"
                          :disabled="readonly"
                          :hide-selected="true"
                          :multiple="true"

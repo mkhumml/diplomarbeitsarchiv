@@ -1,11 +1,16 @@
 <template>
-    <div>
-        <app-header></app-header>
-        <div class="flz-box flz-100">
-            <p></p>
+    <div class="flz-nospacer">
+        <app-header class="flz-box flz-nospacer">
+        </app-header>
+        <div class="flz-box flz-nospacer">
+            <p class="flz-nospacer">Startseite</p>
+            <app-sideNav class="flz-box flz-25-gte-l flz-100-lte-m flz-nospacer">
+            </app-sideNav>
+            <div class="flz-box flz-75-gte-l flz-100-lte-m flz-nospacer">
+                <app-main class="flz-box">
+                </app-main>
+            </div>
         </div>
-        <app-sideNav></app-sideNav>
-        <app-main></app-main>
     </div>
 </template>
 
@@ -27,9 +32,7 @@
                 title: 'Njnja App'
             }
         },
-        methods: {
-
-        }
+        methods: {}
     }
 </script>
 

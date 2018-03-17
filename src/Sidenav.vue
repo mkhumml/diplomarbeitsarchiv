@@ -1,5 +1,5 @@
 <template>
-    <div class="flz-box flz-25 flz-nospacer">
+    <div>
         <login></login>
         <activitylog></activitylog>
     </div>

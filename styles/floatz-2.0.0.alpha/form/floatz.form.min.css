@@ -132,16 +132,15 @@ body {
 .flz-100 {
   width: 100%;
 }
-.flz-spacer:after,
-.flz_nospacer:after {
+.flz-nospacer {
+  padding: 0;
+}
+.flz-nospacer:after {
   clear: both;
   content: "";
   display: block;
   height: 0;
   visibility: hidden;
-}
-.flz-nospacer {
-  padding: 0;
 }
 .flz-mx-box {
   float: left;

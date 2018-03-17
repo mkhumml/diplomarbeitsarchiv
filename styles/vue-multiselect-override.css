@@ -12,3 +12,11 @@
     border: none;
 }
 
+.multiselect--disabled .multiselect__tags {
+    background-color: #eee;
+}
+
+.multiselect--disabled .multiselect__current, .multiselect--disabled .multiselect__select, .multiselect__option--disabled {
+    background-color: #eee;
+}
+

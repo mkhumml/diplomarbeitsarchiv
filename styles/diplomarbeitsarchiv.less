@@ -1,4 +1,4 @@
-@import 'floatz-2.0.0.alpha/core/floatz.core.less';
+@import 'floatz-2.0.0.alpha/core/floatz.core.debug.less';
 @import 'floatz-2.0.0.alpha/form/floatz.form.less';
 /*---------------------Variables-----------------------------*/
 @color-gray-light: #efefef;
@@ -9,6 +9,33 @@
 @color-yellow: #FFD166;
 @color-green: #06D6A0;
 @color-blue: #073B4C;
+
+/*--------------------Global Attributes--------------------------------*/
+img {
+  &.icon {
+    height: 3em;
+    width: 2em;
+    padding-top: 1em;
+  }
+}
+
+h1, h2, p, a, label, input {
+  font-size: 1em;
+}
+
+h1 {
+  color: @color-primary-blue;
+  font-weight: bolder;
+  font-size: 1.25em;
+}
+
+button {
+  background-color: @color-yellow;
+}
+
+a {
+  color: @color-primary-blue;
+}
 
 /*--------------------Classes--------------------------------*/
 .article {
@@ -21,12 +48,8 @@
   background-color: #FFF;
   border-bottom: 1px solid black;
 }
+
 .details {
-/*  input {
-    &[readonly] {
-      opacity: 0.5;
-    }
-  }*/
   img {
     height: 5em;
     width: 10em;
@@ -55,6 +78,13 @@
   h1 {
     padding-left: 0;
   }
+}
+
+.flz-nospacer-left {
+  padding-left: 0;
+}
+.flz-nospacer-right {
+  padding-right: 0;
 }
 
 /*--------------------Media queries--------------------------*/
@@ -91,19 +121,7 @@
 
 #login {
   padding-top: 0;
-  .article {
-    .border {
-      border: 1px solid @color-gray-mid;
-      background-color: @color-gray-light;
-    }
-  }
-}
-
-/*--------------------Global Attributes--------------------------------*/
-img {
-  &.icon {
-    height: 3em;
-    width: 2em;
-    padding-top: 1em;
-  }
+  padding-left: 0;
+  border: 1px solid @color-gray-mid;
+  background-color: @color-gray-light;
 }
