@@ -1,7 +1,7 @@
 <template>
     <div class="flz-box content">
         <div class="flz-box flz-5 flz-nospacer">
-            <img class="icon" src="images/Download.jpeg"/>
+            <div class="icon-file-text-o"></div>
         </div>
         <div class="flz-box flz-85 flz-nospacer">
             <h3>{{diploma.title}}</h3>

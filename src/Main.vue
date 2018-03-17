@@ -2,20 +2,21 @@
 <style src="../styles/vue-multiselect-override.css"></style>
 <template>
     <div id="main">
-        <div v-if="!detailVisible">
-            <div class="flz-box flz-20">
-                <h1>Diplomarbeiten</h1>
-            </div>
+        <div class="flz-box flz-nospacer" v-if="!detailVisible">
+            <h1>Diplomarbeiten</h1>
             <div class="searching flz-form flz-nospacer">
-                <div class="flz-box flz-60">
+                <div class="flz-box flz-25">
                     <input v-model="search" @change="onSearchDiploma" placeholder="search..">
                 </div>
-                <div class="flz-box flz-20">
+                <div class="flz-box flz-25">
                     <a href="#" @click="extendedFilter = !extendedFilter" v-if="extendedFilter === false">Erweiterte
                         Suche</a>
                     <a href="#" @click="extendedFilter = !extendedFilter" v-if="extendedFilter === true">Verstecke
                         Erweiterte
                         Suche</a>
+                </div>
+                <div class="flz-box flz-50 flz-nospacer">
+                    <span class="icon-plus" title="Neue Diplomarbeit anlegen" v-show="!detailVisible" @click="onCreateDiploma"></span>
                 </div>
                 <div v-if="extendedFilter === true" class="flz-box flz-100 flz-nospacer">
                     <div class="flz-box flz-20 flz-nospacer">
@@ -86,7 +87,7 @@
                      @onCancelCreateDiploma="onCancelCreateDiploma">
         </app-details>
         <button v-show="detailVisible" @click="onBackToList">Back to list</button>
-        <button v-show="!detailVisible" @click="onCreateDiploma">Create New</button>
+        <!--<button v-show="!detailVisible" @click="onCreateDiploma">Create New</button>-->
     </div>
 </template>
 <script>

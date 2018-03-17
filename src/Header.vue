@@ -1,11 +1,13 @@
 <template>
     <div id="header">
-        <div class="flz-box flz-10">
-            <img src="images/Download.jpeg"/>
-        </div>
-        <div class="flz-box flz-90">
-            <h1>{{ school }}</h1>
-            <h2>{{ artOfWork }}</h2>
+        <div class="flz-box">
+            <div class="flz-box flz-10">
+                <img src="images/Download.jpeg"/>
+            </div>
+            <div class="flz-box flz-90">
+                <h1>{{ school }}</h1>
+                <h2>{{ artOfWork }}</h2>
+            </div>
         </div>
     </div>
 </template>

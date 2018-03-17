@@ -6,9 +6,11 @@
     <title>Diplomarbeitsarchiv</title>
     <script type="text/javascript" src="scripts/axios-0.17.1.js"></script>
     <link rel="stylesheet" type="text/css" href="styles/diplomarbeitsarchiv.min.css">
+
 </head>
-<body>
-<div id="app"></div>
+<body class="flz-nospacer">
+    <div id="app"></div>
 </body>
 <script src="dist/build.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
 </html>
