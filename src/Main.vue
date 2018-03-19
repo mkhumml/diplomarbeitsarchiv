@@ -2,80 +2,112 @@
 <style src="../styles/vue-multiselect-override.min.css"></style>
 <template>
     <div id="main">
+        <div v-show="detailVisible" class="flz-box flz-nospacer">
+            <div class="flz-box flz-70 flz-nospacer">
+                <h1>Diplomarbeit</h1>
+            </div>
+            <div class="flz-box flz-30">
+                <a @click="onBackToList">Startseite</a>
+            </div>
+        </div>
         <div class="flz-box flz-nospacer" v-if="!detailVisible">
-            <h1>Diplomarbeiten</h1>
-            <div class="searching flz-form flz-nospacer">
-                <div class="flz-box flz-25">
-                    <input v-model="search" @change="onSearchDiploma" placeholder="search..">
+            <div class="flz-box flz-form flz-nospacer searching">
+                <div class="flz-box flz-nospacer">
+                    <div class="flz-box flz-70 flz-nospacer">
+                        <div class="flz-box flz-30 flz-nospacer">
+                            <h1>Diplomarbeiten</h1>
+                        </div>
+                        <div v-if="!extendedFilter" class="flz-box flz-40 flz-nospacer">
+                            <input v-model="search" @change="onSearchDiploma" placeholder="Suchen ...">
+                        </div>
+                    </div>
+                    <div class="flz-box flz-30 flz-nospacer toolbar">
+                        <div class="flz-box">
+                            <a @click="extendedFilter = !extendedFilter" v-if="!extendedFilter">Erweiterte
+                                Suche öffnen</a>
+                            <a @click="extendedFilter = !extendedFilter" v-if="extendedFilter">
+                                Erweiterte Suche schließen</a>
+                        </div>
+                        <div class="iconbar">
+                            <span class="icon-plus" title="Neue Diplomarbeit anlegen" v-show="!detailVisible"
+                              @click="onCreateDiploma"></span>
+                        </div>
+                    </div>
                 </div>
-                <div class="flz-box flz-25">
-                    <a href="#" @click="extendedFilter = !extendedFilter" v-if="extendedFilter === false">Erweiterte
-                        Suche</a>
-                    <a href="#" @click="extendedFilter = !extendedFilter" v-if="extendedFilter === true">Verstecke
-                        Erweiterte
-                        Suche</a>
-                </div>
-                <div class="flz-box flz-50 flz-nospacer">
-                    <span class="icon-plus" title="Neue Diplomarbeit anlegen" v-show="!detailVisible" @click="onCreateDiploma"></span>
-                </div>
-                <div v-if="extendedFilter === true" class="flz-box flz-100 flz-nospacer">
-                    <div class="flz-box flz-20 flz-nospacer">
-                        <input type="text" v-model="searchedYear">
+                <div v-if="extendedFilter" class="flz-box flz-100 flz-nospacer">
+                    <div class="flz-box flz-nospacer flz-50">
+                        <div class="flz-box">
+                            <label for="authors">Verfasser</label>
+                            <multiselect
+                                    id="authors"
+                                    v-model="searchedAuthors"
+                                    :custom-label="showAuthor"
+                                    :close-on-select="true"
+                                    :hide-selected="true"
+                                    :multiple="true"
+                                    :options="optionsAuthors"
+                                    selectLabel=""
+                                    track-by="id">
+                            </multiselect>
+                        </div>
+                        <div class="flz-box">
+                            <label for="tutors">Betreuer</label>
+                            <multiselect
+                                    id="tutors"
+                                    v-model="searchedTutors"
+                                    :custom-label="showTutor"
+                                    :close-on-select="true"
+                                    :hide-selected="true"
+                                    :multiple="true"
+                                    :options="optionsTutors"
+                                    selectLabel=""
+                                    track-by="id">
+                            </multiselect>
+                        </div>
+                        <div class="flz-box">
+                            <label for="departments">Abteilung</label>
+                            <multiselect
+                                    id="departments"
+                                    label="name"
+                                    v-model="searchedDepartments"
+                                    :close-on-select="true"
+                                    :hide-selected="true"
+                                    :multiple="true"
+                                    :options="optionsDepartments"
+                                    selectLabel=""
+                                    track-by="id">
+                            </multiselect>
+                        </div>
                     </div>
-                    <div class="flz-box flz-20 flz-nospacer">
-                        <multiselect
-                                v-model="searchedAuthors"
-                                :custom-label="showAuthor"
-                                :close-on-select="true"
-                                :hide-selected="true"
-                                :multiple="true"
-                                :options="optionsAuthors"
-                                selectLabel=""
-                                track-by="id">
-                        </multiselect>
+                    <div class="flz-box flz-50 flz-nospacer">
+                        <div class="flz-box">
+                            <label for="tags">Tags</label>
+                            <multiselect
+                                    id="tags"
+                                    label="name"
+                                    v-model="searchedTags"
+                                    :close-on-select="true"
+                                    :hide-selected="true"
+                                    :multiple="true"
+                                    :options="optionsTags"
+                                    selectLabel=""
+                                    track-by="id">
+                            </multiselect>
+                        </div>
+                        <div class="flz-box">
+                            <label for="year">Erstellungsjahr</label>
+                            <input id="year" type="text" v-model="searchedYear">
+                        </div>
                     </div>
-                    <div class="flz-box flz-20 flz-nospacer">
-                        <multiselect
-                                v-model="searchedTutors"
-                                :custom-label="showTutor"
-                                :close-on-select="true"
-                                :hide-selected="true"
-                                :multiple="true"
-                                :options="optionsTutors"
-                                selectLabel=""
-                                track-by="id">
-                        </multiselect>
+                    <div class="flz-box">
+                        <button @click="onExtendedFilter">Erweiterte Suche starten</button>
+                        <button @click="onResetExtendedFilter">Erweiterte Sucheinstellungen zurücksetzen</button>
                     </div>
-                    <div class="flz-box flz-20 flz-nospacer">
-                        <multiselect
-                                label="name"
-                                v-model="searchedDepartments"
-                                :close-on-select="true"
-                                :hide-selected="true"
-                                :multiple="true"
-                                :options="optionsDepartments"
-                                selectLabel=""
-                                track-by="id">
-                        </multiselect>
-                    </div>
-                    <div class="flz-box flz-20 flz-nospacer">
-                        <multiselect
-                                label="name"
-                                v-model="searchedTags"
-                                :close-on-select="true"
-                                :hide-selected="true"
-                                :multiple="true"
-                                :options="optionsTags"
-                                selectLabel=""
-                                track-by="id">
-                        </multiselect>
-                    </div>
-                    <button @click="onExtendedFilter">Erweiterte Sucheinstellungen aktivieren</button>
                 </div>
             </div>
-            <div class="flz-nospacer" v-if="this.diplomaList.length > 0">
-                <div v-for="diploma in diplomaList">
-                    <app-content class="flz-nospacer" :diploma="diploma"
+            <div class="flz-box" v-if="this.diplomaList.length > 0">
+                <div class="flz-box content" v-for="diploma in diplomaList">
+                    <app-content :diploma="diploma"
                                  @onSelectDiploma="onSelectDiploma($event)">
                     </app-content>
                 </div>
@@ -86,7 +118,7 @@
                      @onDeleteDiploma="onDeleteDiploma($event)"
                      @onCancelCreateDiploma="onCancelCreateDiploma">
         </app-details>
-        <button v-show="detailVisible" @click="onBackToList">Back to list</button>
+
         <!--<button v-show="!detailVisible" @click="onCreateDiploma">Create New</button>-->
     </div>
 </template>
@@ -149,7 +181,9 @@
                 this.detailVisible = true;
             },
             onSearchDiploma() {
-                axios.post('/diplomarbeitsarchiv/api/diplomarbeiten', this.search)
+                axios.post('/diplomarbeitsarchiv/api/search', {
+                    name: this.search
+                })
                     .then(response => {
                         this.diplomaList = response.data;
                     });
@@ -168,7 +202,7 @@
                 this.searchedDiploma.departments.push(this.searchedDepartments);
                 this.searchedDiploma.tags.push(this.searchedTags);
                 this.searchedDiploma.year = this.searchedYear;
-                axios.post('/diplomarbeitsarchiv/api/diplomarbeiten', this.searchedDiploma)
+                axios.post('/diplomarbeitsarchiv/api/extendedFilter', this.searchedDiploma)
                     .then(response => {
                         console.log(this.searchedDiploma)
                         console.log(response)
@@ -176,6 +210,13 @@
                     .catch(error => {
                         console.log(error)
                     })
+            },
+            onResetExtendedFilter() {
+                this.searchedAuthors = null,
+                    this.searchedTutors = null,
+                    this.searchedDepartments = null,
+                    this.searchedTags = null,
+                    this.searchedYear = ""
             },
             onDeleteDiploma(e) {
                 axios.post('/diplomarbeitsarchiv/api/diplomarbeiten', this.selectedDiploma)

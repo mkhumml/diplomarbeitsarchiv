@@ -2,7 +2,7 @@
     <div id="header">
         <div class="flz-box">
             <div class="flz-box flz-10">
-                <img src="images/Download.jpeg"/>
+                <img src="images/logo.png"/>
             </div>
             <div class="flz-box flz-90">
                 <h1>{{ school }}</h1>

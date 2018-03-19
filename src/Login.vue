@@ -3,43 +3,43 @@
         <h1 v-if="! register  && ! forgotPassword">Anmelden</h1>
         <h1 v-if="register && ! forgotPassword ">Registrieren</h1>
         <h1 v-if="forgotPassword">Reset Password</h1>
-        <div class="flz-box" v-if="! loggedIn && ! register && ! forgotPassword">
-            <label for="email">Email</label>
-            <input id="email" type="text" v-model="email">
-            <label for="password">Passwort</label>
-            <input id="password" type="password" v-model="password"><br>
-            <div class="flz-box flz-50 flz-nospacer">
-                <button v-on:click="onLogin">Login</button>
+        <div class="flz-box">
+            <label v-if="register || !forgotPassword" for="email">Email</label>
+            <input v-if="register || !forgotPassword" id="email" type="text" v-model="email">
+            <label v-if="register" for="repeatemail">Wiederholte Email</label>
+            <input v-if="register" id="repeatemail" type="text" v-model="repeatemail">
+            <label v-if="register || ! forgotPassword" for="password">Passwort</label>
+            <input v-if="register || ! forgotPassword" id="password" type="password" v-model="password">
+            <label v-show="register" for="repeatpassword">Wiederholtes Passwort</label>
+            <input v-show="register" id="repeatpassword" type="password" v-model="repeatpassword">
+            <label v-show="forgotPassword" for="resetpassword">Email</label>
+            <input v-show="forgotPassword" id="resetpassword" type="password" v-model="resetpassword">
+            <br>
+            <div v-show="forgotPassword" class="flz-box flz-50 flz-nospacer">
+                <button @click="onResetPassword">Email senden</button>
             </div>
-            <div class="flz-box flz-50 flz-nospacer">
-                <a @click="forgotPassword = true">Forgot password?</a>
+            <div v-if="forgotPassword" class="flz-box flz-50 flz-nospacer">
+                <button @click="forgotPassword = false">Abbrechen</button>
             </div>
-            <div class="flz-box flz-nospacer">
-                <a @click="register = true">Register</a>
+            <div v-if="! register && ! forgotPassword" class="flz-box flz-50 flz-nospacer">
+                <button @click="onLogin">Einloggen</button>
             </div>
-        </div>
-        <div class="flz-box" v-if="forgotPassword && ! loggedIn && ! register">
-            <label for="resetpassword">Email</label>
-            <input id="resetpassword" type="password" v-model="resetpassword">
-            <button @click="onResetPassword">Reset password</button>
+            <div v-if="! register && ! forgotPassword" class="flz-box flz-50 flz-nospacer paddingtop">
+                <a @click="forgotPassword = true">Passwort vergessen?</a>
+            </div>
+            <div v-if="! register && ! forgotPassword" class="flz-box flz-nospacer paddingtop">
+                <a @click="register = true">Registrieren</a>
+            </div>
+            <div v-if="register" class="flz-box flz-45 flz-nospacer">
+                <button @click="onRegister">Registrieren</button>
+            </div>
+            <div v-if="register" class="flz-box flz-55 flz-nospacer">
+                <button @click="register = false">Abbrechen</button>
         </div>
         <div class="flz-box" v-else-if="loggedIn && ! register && ! forgotPassword">
             <p v-model="lastUsedByMe"></p>
         </div>
-        <div class="flz-box" v-if="register">
-            <label for="email" >Email</label>
-            <input id="email" type="text" v-model="email">
-            <label for="repeatemail">Repeat Email</label>
-            <input id="repeatemail" type="text" v-model="repeatemail">
-            <label for="password">Passwort</label>
-            <input id="password" type="password" v-model="password">
-            <label for="repeatpassword">Repeat Passwort</label>
-            <input id="repeatpassword" type="text" v-model="repeatpassword">
-            <div class="flz-box flz-nospacer">
-                <button @click="onRegister">Register</button>
-                <button @click="register = false">Cancel</button>
-            </div>
-        </div>
+
     </div>
 </template>
 
@@ -66,15 +66,18 @@
                     .then(response => {
                         if (response.data === 1) {
                             console.log("session1")
+                            this.loggedIn = true;
                         }
                         else {
                             console.log("keinesession")
+                            this.loggedIn = false;
+                            this.email = "";
+                            this.password = "";
                         }
                     })
                     .catch(function (error) {
                         console.log(error);
                     });
-                this.loggedIn = true;
             },
             onRegister() {
                 if (this.email === this.repeatemail && this.password === this.repeatpassword) {
@@ -97,7 +100,7 @@
                 }
             },
             onResetPassword() {
-                axios.post('/diplomarbeitsarchiv/api/diplomarbeiten', this.resetpassword)
+                axios.post('/diplomarbeitsarchiv/api/resetpassword', this.resetpassword)
                     .then(response => {
                         console.log(response)
                     })

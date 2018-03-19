@@ -1,45 +1,56 @@
 <template>
-    <div class="flz-box content">
-        <div class="flz-box flz-5 flz-nospacer">
-            <div class="icon-file-text-o"></div>
+    <div class="flz-box flz-nospacer">
+        <div class="flz-box flz-nospacer">
+            <div class="flz-box flz-5 flz-10-lte-m">
+                <div class="icon-file-text-o"></div>
+            </div>
+            <div class="flz-box flz-85 flz-80-lte-m">
+                <h2>{{diploma.title}}</h2>
+                <h3>{{diploma.year}} | {{showDepartments(diploma.departments)}} |
+                    {{showTutors(diploma.tutors)}}</h3>
+            </div>
+            <div class="flz-box flz-10">
+                <p>
+                <span v-show="!collapsed" class="icon-chevron-down" title="Mehr Anzeigen"
+                      @click="collapsed = !collapsed"></span>
+                    <span v-show="collapsed" class="icon-chevron-up" title="Weniger Anzeigen"
+                          @click="collapsed = !collapsed"></span>
+                </p>
+            </div>
         </div>
-        <div class="flz-box flz-85 flz-nospacer">
-            <h3>{{diploma.title}}</h3>
-            <h2>{{diploma.year}} | {{showDepartments(diploma.departments)}} |
-                {{showTutors(diploma.tutors)}}</h2>
-        </div>
-        <div class="flz-box flz-10 flz-nospacer">
-            <button @dblclick="onViewDiploma" @click="collapsed = !collapsed">Show</button>
-        </div>
-        <div v-show="collapsed" class="flz-box flz-100 flz-nospacer">
+        <div v-show="collapsed" class="flz-box flz-100">
             <div class="flz-box flz-5 flz-nospacer">
                 <p></p>
             </div>
             <div class="flz-box flz-60 flz-nospacer contentArticle">
-                <h2>Summary</h2>
+                <h3>Zusammenfassung</h3>
                 <p>
                     {{diploma.summary}}
                 </p>
             </div>
             <div class="flz-box flz-30 flz-nospacer contentArticle">
-                <h2>Notes</h2>
+                <h3>Notizen</h3>
                 <p>
                     {{diploma.notes}}
                 </p>
                 <p>
-                    <button v-on:click="onViewDiploma">View Details</button>
+                    <button v-on:click="onViewDiploma">Details ansehen</button>
                 </p>
             </div>
             <div class="flz-box flz-5 flz-nospacer">
                 <p></p>
             </div>
         </div>
-        <div class="flz-box flz-nospacer flz-5">
-            <p></p>
-        </div>
-        <div class="flz-box flz-95 flz-nospacer">
+        <div class="flz-box flz-5 flz-10-lte-m flz-clear">
             <p>
-                {{showTags(this.diploma.tags)}}
+
+            </p>
+        </div>
+        <div class="flz-box flz-95 flz-90-lte-m">
+            <p>
+            <span v-for="tag in this.diploma.tags">
+                <span class="icon-tag"></span> {{tag.name}}
+            </span>
             </p>
         </div>
     </div>

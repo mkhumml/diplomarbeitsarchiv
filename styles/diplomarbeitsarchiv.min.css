@@ -2198,24 +2198,110 @@ legend {
 body {
   font-family: 'Open Sans', sans-serif;
 }
-img.icon {
-  height: 3em;
-  width: 2em;
-  padding-top: 1em;
-}
 h1 {
   color: #005D95;
   font-weight: 700;
-  font-size: 1.25em;
+}
+h2 {
+  color: #005D95;
+  font-weight: 600;
+}
+h3 {
+  color: #005D95;
 }
 button {
   background-color: #FFD166;
 }
 a {
   color: #005D95;
+  padding: 0.5rem 0;
+  text-decoration: underline;
+}
+a:hover {
+  color: #FFD166;
+  cursor: default;
 }
 label {
   padding: 0.5rem 0;
+}
+span.icon-chevron-down,
+span.icon-chevron-up {
+  float: right;
+}
+/*--------------------Classes--------------------------------*/
+.article {
+  margin: 0 auto;
+  max-width: 75em;
+  position: relative;
+}
+.content {
+  background-color: white;
+  border-bottom: 1px solid #dadada;
+}
+.details img {
+  height: 5em;
+  width: 10em;
+}
+.details h1 {
+  padding-left: 0;
+}
+.contentArticle h3 {
+  border-bottom: 1px solid #005D95;
+}
+.details img {
+  height: 5em;
+  width: 10em;
+}
+.details h1 {
+  padding-left: 0;
+}
+.searching .flz-form input {
+  height: auto;
+}
+.paddingtop {
+  padding-top: 0.5rem;
+}
+/*--------------------Media queries--------------------------*/
+/*--------------------ID-------------------------------------*/
+#header {
+  background-color: #005D95;
+}
+#header h1 {
+  font-weight: bolder;
+  font-size: 1.4em;
+  color: #dadada;
+  padding-bottom: 0.1em;
+}
+#header h2 {
+  font-weight: bolder;
+  font-size: 1.3em;
+  color: #efefef;
+  padding-top: 0.1em;
+}
+#header img {
+  height: 55px;
+}
+#main {
+  border: 1px solid #dadada;
+  background-color: #efefef;
+}
+#main .searching h1 {
+  display: inline-block;
+}
+#login {
+  border: 1px solid #dadada;
+  background-color: #efefef;
+}
+.flz-form input[type=file] {
+  border: none;
+}
+.toolbar {
+  position: relative;
+}
+.iconbar {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 /*-----------------------------Icons------------------------------*/
 @font-face {
@@ -2244,6 +2330,7 @@ label {
 }
 .icon-plus:before {
   content: "\f067";
+  color: #005D95;
 }
 .icon-question:before {
   content: "\f128";
@@ -2385,6 +2472,7 @@ label {
 }
 .icon-tag:before {
   content: "\f02b";
+  color: #005D95;
 }
 .icon-tags:before {
   content: "\f02c";
@@ -2610,9 +2698,11 @@ label {
 }
 .icon-chevron-up:before {
   content: "\f077";
+  color: #005D95;
 }
 .icon-chevron-down:before {
   content: "\f078";
+  color: #005D95;
 }
 .icon-retweet:before {
   content: "\f079";
@@ -2988,7 +3078,8 @@ label {
 }
 .icon-file-text-o:before {
   content: "\f0f6";
-  font-size: 1.5em;
+  font-size: 2em;
+  opacity: 0.5;
 }
 .icon-building-o:before {
   content: "\f0f7";
@@ -4597,77 +4688,4 @@ label {
 }
 .icon-meetup:before {
   content: "\f2e0";
-}
-/*--------------------Classes--------------------------------*/
-.article {
-  margin: 0 auto;
-  max-width: 75em;
-  position: relative;
-}
-.content {
-  background-color: #FFF;
-  border-bottom: 1px solid black;
-}
-.details img {
-  height: 5em;
-  width: 10em;
-}
-.details h1 {
-  padding-left: 0;
-}
-.contentArticle h2 {
-  border-bottom: 1px solid black;
-}
-.details img {
-  height: 5em;
-  width: 10em;
-}
-.details h1 {
-  padding-left: 0;
-}
-.flz-nospacer-left {
-  padding-left: 0;
-}
-.flz-nospacer-right {
-  padding-right: 0;
-}
-/*--------------------Media queries--------------------------*/
-/*--------------------ID-------------------------------------*/
-#header {
-  background-color: #005D95;
-}
-#header h1 {
-  font-weight: bolder;
-  font-size: 1.4em;
-  color: #dadada;
-  padding-bottom: 0.1em;
-}
-#header h2 {
-  font-weight: bolder;
-  font-size: 1.3em;
-  color: #efefef;
-  padding-top: 0.1em;
-}
-#main {
-  border: 1px solid #dadada;
-  background-color: #efefef;
-}
-#main .searching h1 {
-  display: inline-block;
-}
-#main .searching input {
-  padding: 0.25em;
-  float: right;
-}
-#login {
-  border: 1px solid #dadada;
-  background-color: #efefef;
-}
-.flz-form input,
-.attachments {
-  border: 1px solid #aaa;
-}
-.flz-form input[type=file] {
-  border: none;
-  padding: 0.5rem 0;
 }

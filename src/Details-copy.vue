@@ -3,53 +3,9 @@
 <template>
     <div class="flz-box flz-form flz-nospacer details">
         <div class="flz-box flz-nospacer">
-            <div class="flz-box flz-70">
+            <div class="flz-box flz-50">
                 <label for="title">Titel</label>
                 <input id="title" type="text" v-model="diploma.title" :readonly="readonly">
-            </div>
-            <div class="flz-box flz-30">
-                <label for="year">Jahr</label>
-                <input id="year" type="text" v-model="diploma.year" :readonly="readonly">
-            </div>
-        </div>
-        <div class="flz-box">
-            <label for="authors">Verfasser</label>
-            <multiselect
-                    id="authors"
-                    placeholder="Firstname / Lastname"
-                    tagPlaceholder="Firstname / Lastname"
-                    v-model="diploma.authors"
-                    :custom-label="showAuthor"
-                    :close-on-select="true"
-                    :disabled="readonly"
-                    :hide-selected="true"
-                    :multiple="true"
-                    :options="optionsAuthors"
-                    selectLabel=""
-                    track-by="id"
-                    :taggable="true"
-                    @tag="addAuthor">
-            </multiselect>
-        </div>
-        <div class="flz-box flz-nospacer">
-            <div class="flz-box flz-50">
-                <label for="tutors">Betreuer</label>
-                <multiselect
-                        id="tutors"
-                        placeholder="Firstname / Lastname"
-                        tagPlaceholder="Firstname / Lastname"
-                        v-model="diploma.tutors"
-                        :custom-label="showTutor"
-                        :close-on-select="true"
-                        :disabled="readonly"
-                        :hide-selected="true"
-                        :multiple="true"
-                        :options="optionsTutors"
-                        selectLabel=""
-                        track-by="id"
-                        :taggable="true"
-                        @tag="addTutor">
-                </multiselect>
             </div>
             <div class="flz-box flz-50">
                 <label for="department">Abteilung</label>
@@ -70,6 +26,50 @@
         </div>
         <div class="flz-box flz-nospacer">
             <div class="flz-box flz-50">
+                <label for="authors">Verfasser</label>
+                <multiselect
+                        id="authors"
+                        placeholder="Firstname / Lastname"
+                        tagPlaceholder="Firstname / Lastname"
+                        v-model="diploma.authors"
+                        :custom-label="showAuthor"
+                        :close-on-select="true"
+                        :disabled="readonly"
+                        :hide-selected="true"
+                        :multiple="true"
+                        :options="optionsAuthors"
+                        selectLabel=""
+                        track-by="id"
+                        :taggable="true"
+                        @tag="addAuthor">
+                </multiselect>
+            </div>
+            <div class="flz-box flz-50">
+                <label for="tutors">Betreuer</label>
+                <multiselect
+                        id="tutors"
+                        placeholder="Firstname / Lastname"
+                        tagPlaceholder="Firstname / Lastname"
+                        v-model="diploma.tutors"
+                        :custom-label="showTutor"
+                        :close-on-select="true"
+                        :disabled="readonly"
+                        :hide-selected="true"
+                        :multiple="true"
+                        :options="optionsTutors"
+                        selectLabel=""
+                        track-by="id"
+                        :taggable="true"
+                        @tag="addTutor">
+                </multiselect>
+            </div>
+        </div>
+        <div class="flz-box flz-nospacer">
+            <div class="flz-box flz-30">
+                <label for="year">Jahr</label>
+                <input id="year" type="text" v-model="diploma.year" :readonly="readonly">
+            </div>
+            <div class="flz-box flz-35">
                 <label for="diplomarbeit">Diplomarbeit</label>
                 <div v-if="diploma.upload.tmp_name !== null" class="flz-box attachments">
                     <a v-bind:href="diploma.upload.tmp_name" target="_blank">{{diploma.upload.name}}</a>
@@ -77,7 +77,7 @@
                 <input id="diplomarbeit" type="file" id="file" value="" ref="diploma" v-on:change="onDiplomaSelected"
                        :disabled="readonly" v-show="!readonly"/>
             </div>
-            <div class="flz-box flz-50">
+            <div class="flz-box flz-35">
                 <label>Anhänge</label>
                 <ul class="attachments">
                     <li v-for="attachment in diploma.attachments">
