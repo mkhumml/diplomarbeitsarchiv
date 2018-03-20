@@ -2225,7 +2225,8 @@ label {
   padding: 0.5rem 0;
 }
 span.icon-chevron-down,
-span.icon-chevron-up {
+span.icon-chevron-up,
+span.icon-home {
   float: right;
 }
 /*--------------------Classes--------------------------------*/
@@ -2245,6 +2246,9 @@ span.icon-chevron-up {
 .details h1 {
   padding-left: 0;
 }
+.details button:nth-child(even) {
+  margin-left: 1rem;
+}
 .contentArticle h3 {
   border-bottom: 1px solid #005D95;
 }
@@ -2258,28 +2262,57 @@ span.icon-chevron-up {
 .searching .flz-form input {
   height: auto;
 }
+.searching button:last-child {
+  margin-left: 1rem;
+}
 .paddingtop {
   padding-top: 0.5rem;
 }
 /*--------------------Media queries--------------------------*/
+@media (max-width: 767px) {
+  .icon-file-text-o:before {
+    font-size: 1.5em;
+    padding-top: 0.5em;
+    padding-left: 0;
+  }
+  .icon-file-text-o[class^="icon-"],
+  [class*=" icon-"] {
+    padding-left: 0;
+  }
+}
 /*--------------------ID-------------------------------------*/
 #header {
+  position: relative;
   background-color: #005D95;
 }
 #header h1 {
+  position: absolute;
+  top: 0.7em;
+  left: 3.8em;
   font-weight: bolder;
   font-size: 1.4em;
   color: #dadada;
   padding-bottom: 0.1em;
+  padding-left: 1em;
+  float: left;
 }
 #header h2 {
+  position: absolute;
+  top: 2em;
+  left: 4.2em;
   font-weight: bolder;
   font-size: 1.3em;
   color: #efefef;
   padding-top: 0.1em;
+  padding-left: 1em;
+  float: left;
 }
 #header img {
-  height: 55px;
+  height: 5rem;
+  width: 5rem;
+}
+#header .flz-inline {
+  display: inline-block;
 }
 #main {
   border: 1px solid #dadada;
@@ -2409,6 +2442,7 @@ span.icon-chevron-up {
 }
 .icon-home:before {
   content: "\f015";
+  color: #005D95;
 }
 .icon-file-o:before {
   content: "\f016";

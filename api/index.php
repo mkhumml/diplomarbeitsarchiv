@@ -158,8 +158,6 @@ Flight::route('POST /diplomarbeiten', function () {
             }
         }
     }
-
-    /*
         if($diploma["id"] === null) {
             // Create new diploma in db
         } else {
@@ -169,8 +167,6 @@ Flight::route('POST /diplomarbeiten', function () {
         // Save new tags into data base (those that have null as id)
 
         // Return created/updated diploma as JSON to client
-    */
-
     echo(json_encode($diploma));
 });
 

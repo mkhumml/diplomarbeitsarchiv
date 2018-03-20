@@ -2,6 +2,9 @@
 @color-primary-blue: #005D95;
 @color-gray-light: #efefef;
 @color-yellow: #FFD166;
+@white: #FFF;
+@black: #000;
+@color-gray-light: #efefef;
 
 .multiselect, .multiselect__tags-wrap {
   padding: 0;
@@ -45,13 +48,14 @@
 }
 
 .multiselect__option {
-  background: @color-primary-blue;
-  border: 1px solid #FFF;
-  color: #FFF;
+  border: 1px solid @black;
+  background: @color-gray-light;
+  color: @black;
 }
 
-.multiselect__option .multiselect__option--highlight {
+.multiselect__option--highlight {
   background: @color-primary-blue;
+  color: @white;
 }
 
 .multiselect__tag-icon:hover {

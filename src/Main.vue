@@ -7,21 +7,21 @@
                 <h1>Diplomarbeit</h1>
             </div>
             <div class="flz-box flz-30">
-                <a @click="onBackToList">Startseite</a>
+                <span class="icon-home" title="Startseite" @click="onBackToList"></span>
             </div>
         </div>
         <div class="flz-box flz-nospacer" v-if="!detailVisible">
             <div class="flz-box flz-form flz-nospacer searching">
                 <div class="flz-box flz-nospacer">
-                    <div class="flz-box flz-70 flz-nospacer">
-                        <div class="flz-box flz-30 flz-nospacer">
+                    <div class="flz-box flz-70 flz-100-lte-s flz-nospacer">
+                        <div class="flz-box flz-30 flz-100-lte-s flz-nospacer">
                             <h1>Diplomarbeiten</h1>
                         </div>
-                        <div v-if="!extendedFilter" class="flz-box flz-40 flz-nospacer">
+                        <div v-if="!extendedFilter" class="flz-box flz-70 flz-100-lte-s flz-nospacer-gte-m">
                             <input v-model="search" @change="onSearchDiploma" placeholder="Suchen ...">
                         </div>
                     </div>
-                    <div class="flz-box flz-30 flz-nospacer toolbar">
+                    <div class="flz-box flz-30 flz-100-lte-s flz-nospacer toolbar">
                         <div class="flz-box">
                             <a @click="extendedFilter = !extendedFilter" v-if="!extendedFilter">Erweiterte
                                 Suche öffnen</a>
@@ -119,7 +119,6 @@
                      @onCancelCreateDiploma="onCancelCreateDiploma">
         </app-details>
 
-        <!--<button v-show="!detailVisible" @click="onCreateDiploma">Create New</button>-->
     </div>
 </template>
 <script>

@@ -3,11 +3,11 @@
 <template>
     <div class="flz-box flz-form flz-nospacer details">
         <div class="flz-box flz-nospacer">
-            <div class="flz-box flz-70">
+            <div class="flz-box flz-70 flz-100-lte-xs">
                 <label for="title">Titel</label>
                 <input id="title" type="text" v-model="diploma.title" :readonly="readonly">
             </div>
-            <div class="flz-box flz-30">
+            <div class="flz-box flz-30 flz-100-lte-xs">
                 <label for="year">Jahr</label>
                 <input id="year" type="text" v-model="diploma.year" :readonly="readonly">
             </div>
@@ -32,7 +32,7 @@
             </multiselect>
         </div>
         <div class="flz-box flz-nospacer">
-            <div class="flz-box flz-50">
+            <div class="flz-box flz-50 flz-100-lte-xs">
                 <label for="tutors">Betreuer</label>
                 <multiselect
                         id="tutors"
@@ -51,7 +51,7 @@
                         @tag="addTutor">
                 </multiselect>
             </div>
-            <div class="flz-box flz-50">
+            <div class="flz-box flz-50 flz-100-lte-xs">
                 <label for="department">Abteilung</label>
                 <multiselect id="department"
                              v-model="diploma.departments"
@@ -68,8 +68,9 @@
                 </multiselect>
             </div>
         </div>
+        <!--Upload im Responsive Design hat keine Buttons-->
         <div class="flz-box flz-nospacer">
-            <div class="flz-box flz-50">
+            <div class="flz-box flz-50 flz-100-lte-xs">
                 <label for="diplomarbeit">Diplomarbeit</label>
                 <div v-if="diploma.upload.tmp_name !== null" class="flz-box attachments">
                     <a v-bind:href="diploma.upload.tmp_name" target="_blank">{{diploma.upload.name}}</a>
@@ -77,7 +78,7 @@
                 <input id="diplomarbeit" type="file" id="file" value="" ref="diploma" v-on:change="onDiplomaSelected"
                        :disabled="readonly" v-show="!readonly"/>
             </div>
-            <div class="flz-box flz-50">
+            <div class="flz-box flz-50 flz-100-lte-xs">
                 <label>Anhänge</label>
                 <ul class="attachments">
                     <li v-for="attachment in diploma.attachments">
@@ -90,12 +91,12 @@
         </div>
         <div class="flz-box flz-nospacer">
             <div class="flz-box flz-nospacer">
-                <div class="flz-box flz-50">
+                <div class="flz-box flz-50 flz-100-lte-xs">
                     <label for="summary">Zusammenfassung</label>
                     <textarea id="summary" rows="10" v-model="diploma.summary"
                               :disabled="readonly">{{diploma.summary}}</textarea>
                 </div>
-                <div class="flz-box flz-50">
+                <div class="flz-box flz-50 flz-100-lte-xs">
                     <label for="notes">Notizen</label>
                     <textarea id="notes" rows="10" v-model="diploma.notes"
                               :disabled="readonly">{{diploma.notes}}</textarea>

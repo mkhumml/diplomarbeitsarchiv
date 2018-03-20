@@ -19,10 +19,12 @@ h1 {
   color: @color-primary-blue;
   font-weight: 700;
 }
+
 h2 {
   color: @color-primary-blue;
   font-weight: 600;
 }
+
 h3 {
   color: @color-primary-blue;
 }
@@ -36,6 +38,7 @@ a {
   padding: @flz-var-gutter-text-y / 2 0;
   text-decoration: underline;
 }
+
 a:hover {
   color: @color-yellow;
   cursor: default;
@@ -44,9 +47,11 @@ a:hover {
 label {
   padding: @flz-var-gutter-text-y / 2 0;
 }
-span.icon-chevron-down, span.icon-chevron-up {
+
+span.icon-chevron-down, span.icon-chevron-up, span.icon-home {
   float: right;
 }
+
 /*--------------------Classes--------------------------------*/
 .article {
   margin: 0 auto;
@@ -66,6 +71,9 @@ span.icon-chevron-down, span.icon-chevron-up {
   }
   h1 {
     padding-left: 0;
+  }
+  button:nth-child(even) {
+    margin-left: 1rem;
   }
 }
 
@@ -89,28 +97,60 @@ span.icon-chevron-down, span.icon-chevron-up {
   height: auto;
 }
 
+.searching {
+  button:last-child {
+    margin-left: 1rem;
+  }
+}
+
 .paddingtop {
   padding-top: 0.5rem;
 }
 
 /*--------------------Media queries--------------------------*/
+@media @flz-media-lte-s {
+    .icon-file-text-o:before {
+      font-size: 1.5em;
+      padding-top: 0.5em;
+      padding-left: 0;
+    }
+    .icon-file-text-o[class^="icon-"], [class*=" icon-"] {
+      padding-left: 0;
+    }
+}
+
 /*--------------------ID-------------------------------------*/
 #header {
+  position: relative;
   background-color: @color-primary-blue;
   h1 {
+    position: absolute;
+    top: 0.7em;
+    left: 3.8em;
     font-weight: bolder;
     font-size: 1.4em;
     color: @color-gray-mid;
     padding-bottom: 0.1em;
+    padding-left: 1em;
+    float: left
   }
   h2 {
+    position: absolute;
+    top: 2em;
+    left: 4.2em;
     font-weight: bolder;
     font-size: 1.3em;
     color: @color-gray-light;
     padding-top: 0.1em;
+    padding-left: 1em;
+    float: left;
   }
   img {
-    height: 55px;
+    height: 5rem;
+    width: 5rem;
+  }
+  .flz-inline {
+    display: inline-block;
   }
 }
 
@@ -128,7 +168,6 @@ span.icon-chevron-down, span.icon-chevron-up {
   border: 1px solid @color-gray-mid;
   background-color: @color-gray-light;
 }
-
 
 .flz-form input[type=file] {
   border: none;
@@ -283,6 +322,7 @@ span.icon-chevron-down, span.icon-chevron-up {
 
 .icon-home:before {
   content: "\f015";
+  color: @color-primary-blue;
 }
 
 .icon-file-o:before {

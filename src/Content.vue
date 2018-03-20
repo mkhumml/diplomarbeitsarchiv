@@ -4,10 +4,11 @@
             <div class="flz-box flz-5 flz-10-lte-m">
                 <div class="icon-file-text-o"></div>
             </div>
-            <div class="flz-box flz-85 flz-80-lte-m">
-                <h2>{{diploma.title}}</h2>
-                <h3>{{diploma.year}} | {{showDepartments(diploma.departments)}} |
-                    {{showTutors(diploma.tutors)}}</h3>
+            <div class="flz-box flz-85 flz-80-lte-m flz-80-gte-m">
+                <h2 @click="onViewDiploma">{{diploma.title}}</h2>
+                <p>{{showDepartments(diploma.departments)}} | {{diploma.year}} |
+                    {{showTutors(diploma.tutors)}}
+                </p>
             </div>
             <div class="flz-box flz-10">
                 <p>
@@ -19,16 +20,19 @@
             </div>
         </div>
         <div v-show="collapsed" class="flz-box flz-100">
-            <div class="flz-box flz-5 flz-nospacer">
+            <div class="flz-box flz-5 flz-10-lte-s flz-nospacer">
                 <p></p>
             </div>
-            <div class="flz-box flz-60 flz-nospacer contentArticle">
+            <div class="flz-box flz-60 flz-55-lte-m flz-90-lte-s flz-nospacer contentArticle">
                 <h3>Zusammenfassung</h3>
                 <p>
                     {{diploma.summary}}
                 </p>
             </div>
-            <div class="flz-box flz-30 flz-nospacer contentArticle">
+            <div class="flz-box flz-5 flz-10-lte-s flz-nospacer">
+                <p></p>
+            </div>
+            <div class="flz-box flz-35-gte-m flz-90-lte-s flz-nospacer contentArticle">
                 <h3>Notizen</h3>
                 <p>
                     {{diploma.notes}}
@@ -37,21 +41,23 @@
                     <button v-on:click="onViewDiploma">Details ansehen</button>
                 </p>
             </div>
-            <div class="flz-box flz-5 flz-nospacer">
+            <div class="flz-box flz-5 flz-hide-lte-s flz-nospacer">
                 <p></p>
             </div>
         </div>
-        <div class="flz-box flz-5 flz-10-lte-m flz-clear">
-            <p>
+        <div class="flz-box flz-nospacer">
+            <div class="flz-box flz-5 flz-10-lte-m flz-clear">
+                <p>
 
-            </p>
-        </div>
-        <div class="flz-box flz-95 flz-90-lte-m">
-            <p>
+                </p>
+            </div>
+            <div class="flz-box flz-85 flz-80-lte-m">
+                <p>
             <span v-for="tag in this.diploma.tags">
                 <span class="icon-tag"></span> {{tag.name}}
             </span>
-            </p>
+                </p>
+            </div>
         </div>
     </div>
 </template>
@@ -89,21 +95,11 @@
                 for (let i = 0; i < tutors.length; i++) {
                     display += tutors[i].firstname + " " + tutors[i].lastname + " "
                     if (i < (tutors.length - 1)) {
-                        display += ""
+                        display += " , "
                     }
                 }
                 return display
-            },
-            showTags(tags) {
-                let display = "";
-                for (let i = 0; i < tags.length; i++) {
-                    display += tags[i].name + " "
-                    if (i < (tags.length - 1)) {
-                    }
-
-                }
-                return display
-            },
+            }
         }
     }
 </script>

@@ -1,10 +1,8 @@
 <template>
-    <div id="header">
+    <div id="header" class="flz-box">
         <div class="flz-box">
-            <div class="flz-box flz-10">
+            <div class="flz-box">
                 <img src="images/logo.png"/>
-            </div>
-            <div class="flz-box flz-90">
                 <h1>{{ school }}</h1>
                 <h2>{{ artOfWork }}</h2>
             </div>
