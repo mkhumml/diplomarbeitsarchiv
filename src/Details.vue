@@ -16,17 +16,17 @@
             <label for="authors">Verfasser</label>
             <multiselect
                     id="authors"
-                    placeholder="Firstname / Lastname"
-                    tagPlaceholder="Firstname / Lastname"
+                    placeholder="Vorname / Nachname"
+                    track-by="id"
+                    tagPlaceholder="Vorname / Nachname"
+                    selectLabel=""
                     v-model="diploma.authors"
-                    :custom-label="showAuthor"
                     :close-on-select="true"
+                    :custom-label="showAuthor"
                     :disabled="readonly"
                     :hide-selected="true"
                     :multiple="true"
                     :options="optionsAuthors"
-                    selectLabel=""
-                    track-by="id"
                     :taggable="true"
                     @tag="addAuthor">
             </multiselect>
@@ -36,17 +36,17 @@
                 <label for="tutors">Betreuer</label>
                 <multiselect
                         id="tutors"
-                        placeholder="Firstname / Lastname"
-                        tagPlaceholder="Firstname / Lastname"
+                        placeholder="Vorname / Nachname"
+                        selectLabel=""
+                        tagPlaceholder="Vorname / Nachname"
+                        track-by="id"
                         v-model="diploma.tutors"
-                        :custom-label="showTutor"
                         :close-on-select="true"
+                        :custom-label="showTutor"
                         :disabled="readonly"
                         :hide-selected="true"
                         :multiple="true"
                         :options="optionsTutors"
-                        selectLabel=""
-                        track-by="id"
                         :taggable="true"
                         @tag="addTutor">
                 </multiselect>
@@ -54,15 +54,17 @@
             <div class="flz-box flz-50 flz-100-lte-xs">
                 <label for="department">Abteilung</label>
                 <multiselect id="department"
+                             label="name"
+                             selectLabel=""
+                             placeholder="Abteilung"
+                             tagPlaceholder="Abteilung"
+                             track-by="id"
                              v-model="diploma.departments"
                              :close-on-select="true"
                              :disabled="readonly"
                              :hide-selected="true"
                              :multiple="true"
                              :options="optionsDepartments"
-                             selectLabel=""
-                             label="name"
-                             track-by="id"
                              :taggable="true"
                              @tag="addDepartment">
                 </multiselect>
@@ -72,7 +74,7 @@
         <div class="flz-box flz-nospacer">
             <div class="flz-box flz-50 flz-100-lte-xs">
                 <label for="diplomarbeit">Diplomarbeit</label>
-                <div v-if="diploma.upload.tmp_name !== null" class="flz-box attachments">
+                <div v-if="diploma.upload.tmp_name !== null" class="flz-box attachments flz-nospacer">
                     <a v-bind:href="diploma.upload.tmp_name" target="_blank">{{diploma.upload.name}}</a>
                 </div>
                 <input id="diplomarbeit" type="file" id="file" value="" ref="diploma" v-on:change="onDiplomaSelected"
@@ -80,7 +82,7 @@
             </div>
             <div class="flz-box flz-50 flz-100-lte-xs">
                 <label>Anhänge</label>
-                <ul class="attachments">
+                <ul class="attachments flz-nospacer">
                     <li v-for="attachment in diploma.attachments">
                         <a v-bind:href="attachment.tmp_name" target="_blank">{{attachment.name}}</a>
                     </li>
@@ -103,6 +105,24 @@
                 </div>
             </div>
 
+        </div>
+        <div class="flz-box">
+            <label for="tag">Tags</label>
+            <multiselect id="tag"
+                         label="name"
+                         selectLabel=""
+                         placeholder="Tags"
+                         tagPlaceholder="Tags"
+                         track-by="id"
+                         v-model="diploma.tags"
+                         :close-on-select="true"
+                         :disabled="readonly"
+                         :hide-selected="true"
+                         :multiple="true"
+                         :options="optionsTags"
+                         :taggable="true"
+                         @tag="addTag">
+            </multiselect>
         </div>
         <div class="flz-box">
             <button v-show="readonly" v-on:click="onEdit">Bearbeiten</button>

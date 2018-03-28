@@ -156,17 +156,17 @@ Flight::route('POST /diplomarbeiten', function () {
                 // Read file name into diploma data
                 array_push($diploma["attachments"], array("id" => null, "name" => $_FILES["attachments"]["name"][$key], "tmp_name" => "./uploads/{$name}"));
             }
-        }
+          }
     }
-        if($diploma["id"] === null) {
-            // Create new diploma in db
-        } else {
-            // Update diploma with id in db
-        }
-        // Get created/updated diploma from db
-        // Save new tags into data base (those that have null as id)
+    if ($diploma["id"] === null) {
+        // Create new diploma in db
+    } else {
+        // Update diploma with id in db
+    }
+    // Get created/updated diploma from db
+    // Save new tags into data base (those that have null as id)
 
-        // Return created/updated diploma as JSON to client
+    // Return created/updated diploma as JSON to client
     echo(json_encode($diploma));
 });
 
@@ -198,8 +198,18 @@ Flight::route('POST /login', function () {
     $user = json_decode($json, true);
     $email = $user["email"];
     $password = $user["password"];
-    echo(json_encode($user));
-
+    if ($user["email"] == "logout") {
+        $session = 0;
+        echo(json_encode($session));
+    } else {
+        if ($user["email"] == "asdf") {
+            $session = 1;
+            echo(json_encode($session));
+        } else {
+            $session = 0;
+            echo(json_encode($session));
+        }
+    }
     $data = $conn->query("SELECT * FROM user WHERE email LIKE '$email' AND password LIKE '$password'");
 
     if ($data->fetchColumn() > 0) {

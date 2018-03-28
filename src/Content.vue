@@ -6,9 +6,7 @@
             </div>
             <div class="flz-box flz-85 flz-80-lte-m flz-80-gte-m">
                 <h2 @click="onViewDiploma">{{diploma.title}}</h2>
-                <p>{{showDepartments(diploma.departments)}} | {{diploma.year}} |
-                    {{showTutors(diploma.tutors)}}
-                </p>
+                <p>{{showDepartments(diploma.departments)}} | {{diploma.year}} | {{showTutors(diploma.tutors)}}</p>
             </div>
             <div class="flz-box flz-10">
                 <p>
@@ -20,7 +18,7 @@
             </div>
         </div>
         <div v-show="collapsed" class="flz-box flz-100">
-            <div class="flz-box flz-5 flz-10-lte-s flz-nospacer">
+            <div class="flz-box flz-5 flz-10-lte-m flz-nospacer-gte-m">
                 <p></p>
             </div>
             <div class="flz-box flz-60 flz-55-lte-m flz-90-lte-s flz-nospacer contentArticle">
@@ -29,8 +27,8 @@
                     {{diploma.summary}}
                 </p>
             </div>
-            <div class="flz-box flz-5 flz-10-lte-s flz-nospacer">
-                <p></p>
+            <div class="flz-box flz-5 flz-10-lte-m flz-nospacer-gte-m">
+                <p class="flz-nospacer"></p>
             </div>
             <div class="flz-box flz-35-gte-m flz-90-lte-s flz-nospacer contentArticle">
                 <h3>Notizen</h3>

@@ -5,6 +5,7 @@
 @white: #FFF;
 @black: #000;
 @color-gray-light: #efefef;
+@color-green: #06D6A0;
 
 .multiselect, .multiselect__tags-wrap {
   padding: 0;
@@ -25,15 +26,7 @@
   margin: 0;
   height: (@font-size * 2) - 2;
 }
-/*
-.searching .multiselect__tags {
-    height: 2rem;
-}
-.searching .multiselect__tags input.multiselect__input {
-    margin-bottom: 0;
-    padding-bottom: 1em;
-}
-*/
+
 .multiselect--disabled .multiselect__tags {
   background-color: #eee;
 
@@ -71,3 +64,6 @@
   background: transparent;
 }
 
+.multiselect__option--highlight:after {
+  background: @color-green;
+}

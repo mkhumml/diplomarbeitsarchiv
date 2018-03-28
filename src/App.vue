@@ -3,10 +3,11 @@
         <app-header class="flz-box flz-nospacer">
         </app-header>
         <div class="flz-box">
-            <app-sideNav class="flz-box flz-25-gte-l flz-100-lte-m">
+            <app-sideNav :loggedIn="loggedIn" @onSuccessLogin="onSuccessLogin($event)"
+                         class="flz-box flz-25-gte-l flz-100-lte-m">
             </app-sideNav>
             <div class="flz-box flz-75-gte-l flz-100-lte-m">
-                <app-main class="flz-box">
+                <app-main :loggedIn="loggedIn" class="flz-box">
                 </app-main>
             </div>
         </div>
@@ -28,10 +29,14 @@
         },
         data() {
             return {
-                title: 'Njnja App'
+                loggedIn: false
             }
         },
-        methods: {}
+        methods: {
+            onSuccessLogin($event) {
+                this.loggedIn = $event;
+            }
+        }
     }
 </script>
 

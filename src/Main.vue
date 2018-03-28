@@ -7,34 +7,45 @@
                 <h1>Diplomarbeit</h1>
             </div>
             <div class="flz-box flz-30">
-                <span class="icon-home" title="Startseite" @click="onBackToList"></span>
+                <span class="icon-home" title="Startseite"
+                      @click="onBackToList"></span>
             </div>
         </div>
         <div class="flz-box flz-nospacer" v-if="!detailVisible">
             <div class="flz-box flz-form flz-nospacer searching">
                 <div class="flz-box flz-nospacer">
                     <div class="flz-box flz-70 flz-100-lte-s flz-nospacer">
-                        <div class="flz-box flz-30 flz-100-lte-s flz-nospacer">
+                        <div class="flz-box flz-30 flz-100-lte-s
+                             flz-nospacer">
                             <h1>Diplomarbeiten</h1>
                         </div>
-                        <div v-if="!extendedFilter" class="flz-box flz-70 flz-100-lte-s flz-nospacer-gte-m">
-                            <input v-model="search" @change="onSearchDiploma" placeholder="Suchen ...">
+                        <div v-if="!extendedFilter" class="flz-box flz-70
+                            flz-100-lte-s flz-nospacer-gte-m">
+                            <input v-model="search"
+                                   @change="onSearchDiploma"
+                                   placeholder="Suchen ...">
                         </div>
                     </div>
-                    <div class="flz-box flz-30 flz-100-lte-s flz-nospacer toolbar">
+                    <div class="flz-box flz-30 flz-100-lte-s flz-nospacer
+                         toolbar">
                         <div class="flz-box">
-                            <a @click="extendedFilter = !extendedFilter" v-if="!extendedFilter">Erweiterte
+                            <a @click="extendedFilter = !extendedFilter"
+                               v-if="!extendedFilter">Erweiterte
                                 Suche öffnen</a>
-                            <a @click="extendedFilter = !extendedFilter" v-if="extendedFilter">
+                            <a @click="extendedFilter = !extendedFilter"
+                               v-if="extendedFilter">
                                 Erweiterte Suche schließen</a>
                         </div>
                         <div class="iconbar">
-                            <span class="icon-plus" title="Neue Diplomarbeit anlegen" v-show="!detailVisible"
-                              @click="onCreateDiploma"></span>
+                            <span class="icon-plus"
+                                  title="Neue Diplomarbeit anlegen"
+                                  v-show="!detailVisible"
+                                  @click="onCreateDiploma"></span>
                         </div>
                     </div>
                 </div>
-                <div v-if="extendedFilter" class="flz-box flz-100 flz-nospacer">
+                <div v-if="extendedFilter" class="flz-box flz-100
+                     flz-nospacer">
                     <div class="flz-box flz-nospacer flz-50">
                         <div class="flz-box">
                             <label for="authors">Verfasser</label>
@@ -96,19 +107,23 @@
                         </div>
                         <div class="flz-box">
                             <label for="year">Erstellungsjahr</label>
-                            <input id="year" type="text" v-model="searchedYear">
+                            <input id="year" type="text"
+                                   v-model="searchedYear">
                         </div>
                     </div>
                     <div class="flz-box">
-                        <button @click="onExtendedFilter">Erweiterte Suche starten</button>
-                        <button @click="onResetExtendedFilter">Erweiterte Sucheinstellungen zurücksetzen</button>
+                        <button @click="onExtendedFilter">Erweiterte Suche
+                                starten</button>
+                        <button @click="onResetExtendedFilter">Erweiterte
+                                Sucheinstellungen zurücksetzen</button>
                     </div>
                 </div>
             </div>
             <div class="flz-box" v-if="this.diplomaList.length > 0">
-                <div class="flz-box content" v-for="diploma in diplomaList">
+                <div class="flz-box content"
+                     v-for="diploma in diplomaList">
                     <app-content :diploma="diploma"
-                                 @onSelectDiploma="onSelectDiploma($event)">
+                                @onSelectDiploma="onSelectDiploma($event)">
                     </app-content>
                 </div>
             </div>
@@ -129,6 +144,12 @@
         components: {
             'app-content': Content,
             'app-details': Details
+        },
+        props: {
+            loggedIn: {
+                type: Boolean,
+                required: true
+            }
         },
         data() {
             return {
@@ -157,27 +178,36 @@
                 return `${tutor.firstname} ${tutor.lastname}`;
             },
             onSelectDiploma(diploma) {
-                this.selectedDiploma = diploma;
-                this.detailVisible = true;
+                if (this.loggedIn === true) {
+                    this.selectedDiploma = diploma;
+                    this.detailVisible = true;
+                } else {
+                    alert("Bitte Melden Sie sich an!")
+                }
+
             },
             onBackToList() {
                 this.detailVisible = false;
             },
             onCreateDiploma() {
-                this.selectedDiploma = {
-                    "id": null,
-                    "title": "",
-                    "authors": [],
-                    "tutors": [],
-                    "departments": [],
-                    "year": "",
-                    "upload": "",
-                    "summary": [],
-                    "notes": [],
-                    "attachments": "",
-                    "tags": []
-                };
-                this.detailVisible = true;
+                if (this.loggedIn === true) {
+                    this.selectedDiploma = {
+                        "id": null,
+                        "title": "",
+                        "authors": [],
+                        "tutors": [],
+                        "departments": [],
+                        "year": "",
+                        "upload": "",
+                        "summary": [],
+                        "notes": [],
+                        "attachments": "",
+                        "tags": []
+                    };
+                    this.detailVisible = true;
+                } else {
+                    alert("Bitte Melden Sie sich an!")
+                }
             },
             onSearchDiploma() {
                 axios.post('/diplomarbeitsarchiv/api/search', {
