@@ -110,3 +110,7 @@ https://serversideup.net/uploading-files-vuejs-axios/
 http://flightphp.com/
 
 https://vuejs.org/v2/guide/instance.html#Instance-Lifecycle-Hooks
+
+https://de.wikipedia.org/wiki/Ajax_(Programmierung)
+
+https://de.wikipedia.org/wiki/Representational_State_Transfer
