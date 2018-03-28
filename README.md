@@ -108,3 +108,5 @@ https://github.com/shentao/vue-multiselect
 https://serversideup.net/uploading-files-vuejs-axios/
 
 http://flightphp.com/
+
+https://vuejs.org/v2/guide/instance.html#Instance-Lifecycle-Hooks
