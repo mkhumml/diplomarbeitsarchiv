@@ -74,7 +74,7 @@
         <div class="flz-box flz-nospacer">
             <div class="flz-box flz-50 flz-100-lte-xs">
                 <label for="diplomarbeit">Diplomarbeit</label>
-                <div v-if="diploma.upload.tmp_name !== null" class="flz-box attachments flz-nospacer">
+                <div v-if="this.diploma.upload.tmp_name !== null" class="flz-box attachments flz-nospacer">
                     <a v-bind:href="diploma.upload.tmp_name" target="_blank">{{diploma.upload.name}}</a>
                 </div>
                 <input id="diplomarbeit" type="file" id="file" value="" ref="diploma" v-on:change="onDiplomaSelected"
@@ -192,7 +192,6 @@
                     let author = {id: null, firstname: parts[0], lastname: parts[1]};
                     this.optionsAuthors.push(author);
                     this.diploma.authors.push(author);
-                    console.log("successAddAuthor")
                 }
                 else if (parts.length > 2) {
                     console.log("You need to add firstname and lastname")
@@ -204,7 +203,6 @@
                     let tutor = {id: null, firstname: parts[0], lastname: parts[1]};
                     this.optionsTutors.push(tutor);
                     this.diploma.tutors.push(tutor);
-                    console.log("successAddTutor")
                 }
                 else if (parts.length > 2) {
                     console.log("You need to add firstname and lastname")
@@ -246,6 +244,8 @@
                 formData.append("diploma", JSON.stringify(this.diploma));
                 axios.post('/diplomarbeitsarchiv/api/diplomarbeiten/', formData, {headers: {'Content-Type': 'multipart/form-data'}})
                     .then(response => {
+                        console.log(response)
+                        this.diploma.id = response.data.id;
                         this.diploma.title = response.data.title;
                         this.diploma.authors = response.data.authors;
                         this.diploma.tutors = response.data.tutors;
@@ -306,9 +306,9 @@
                 .catch(function (error) {
                     console.log(error);
                 });
+            // GET Methode um alle Tags welche in der Datenbank gespeichert sind zu laden
             axios.get('/diplomarbeitsarchiv/api/tags')
                 .then(response => {
-                    // JSON responses are automatically parsed.
                     this.optionsTags = response.data;
                 })
                 .catch(function (error) {

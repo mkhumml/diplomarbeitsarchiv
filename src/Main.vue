@@ -113,9 +113,11 @@
                     </div>
                     <div class="flz-box">
                         <button @click="onExtendedFilter">Erweiterte Suche
-                                starten</button>
+                            starten
+                        </button>
                         <button @click="onResetExtendedFilter">Erweiterte
-                                Sucheinstellungen zurücksetzen</button>
+                            Sucheinstellungen zurücksetzen
+                        </button>
                     </div>
                 </div>
             </div>
@@ -123,7 +125,7 @@
                 <div class="flz-box content"
                      v-for="diploma in diplomaList">
                     <app-content :diploma="diploma"
-                                @onSelectDiploma="onSelectDiploma($event)">
+                                 @onSelectDiploma="onSelectDiploma($event)">
                     </app-content>
                 </div>
             </div>
@@ -133,7 +135,6 @@
                      @onDeleteDiploma="onDeleteDiploma($event)"
                      @onCancelCreateDiploma="onCancelCreateDiploma">
         </app-details>
-
     </div>
 </template>
 <script>
@@ -266,6 +267,7 @@
             // Get initial list of diplomas
             axios.get('/diplomarbeitsarchiv/api/diplomarbeiten')
                 .then(response => {
+                    console.log(response.data)
                     this.diplomaList = response.data;
                 })
                 .catch(function (error) {
@@ -273,7 +275,6 @@
                 });
             axios.get('/diplomarbeitsarchiv/api/authors')
                 .then(response => {
-                    // JSON responses are automatically parsed.
                     this.optionsAuthors = response.data;
                 })
                 .catch(function (error) {
@@ -281,7 +282,6 @@
                 });
             axios.get('/diplomarbeitsarchiv/api/tutors')
                 .then(response => {
-                    // JSON responses are automatically parsed.
                     this.optionsTutors = response.data;
                 })
                 .catch(function (error) {
@@ -289,7 +289,6 @@
                 });
             axios.get('/diplomarbeitsarchiv/api/departments')
                 .then(response => {
-                    // JSON responses are automatically parsed.
                     this.optionsDepartments = response.data;
                 })
                 .catch(function (error) {
@@ -297,7 +296,6 @@
                 });
             axios.get('/diplomarbeitsarchiv/api/tags')
                 .then(response => {
-                    // JSON responses are automatically parsed.
                     this.optionsTags = response.data;
                 })
                 .catch(function (error) {

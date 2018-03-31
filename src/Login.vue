@@ -3,7 +3,7 @@
         <h1 v-if="! register  && ! forgotPassword">Anmelden</h1>
         <h1 v-if="register && ! forgotPassword ">Registrieren</h1>
         <h1 v-if="forgotPassword">Reset Password</h1>
-        <p v-if="this.errorMessage.length > 0 ||this.successLogin.length > 0">{{errorMessage}}{{successLogin}}</p>
+        <p v-if="this.errorMessage.length > 0 || this.successLogin.length > 0">{{errorMessage}}{{successLogin}}</p>
         <div class="flz-box" v-if="loggedIn && ! register && ! forgotPassword">
             <button @click="onLogout">Ausloggen</button>
         </div>
@@ -24,7 +24,7 @@
                 <input v-show="register" id="repeatpassword" type="password"
                        v-model="repeatpassword">
                 <label v-show="forgotPassword" for="resetpassword">Email</label>
-                <input v-show="forgotPassword" id="resetpassword" type="password"
+                <input v-show="forgotPassword" id="resetpassword" type="text"
                        v-model="resetpassword">
                 <br>
                 <div v-show="forgotPassword" class="flz-box flz-50 flz-nospacer">
@@ -131,6 +131,7 @@
                         });
                     this.register = false;
                     this.loggedIn = true;
+                    this.errorMessage = "";
                 }
                 else {
                     console.log("Email or Password is differently repeated")
@@ -151,7 +152,8 @@
                 this.repeatpassword = "";
             },
             onResetPassword() {
-                axios.post('/diplomarbeitsarchiv/api/resetpassword', this.resetpassword)
+                let object = {id: null, email: this.resetpassword}
+                axios.post('/diplomarbeitsarchiv/api/resetpassword', object)
                     .then(response => {
                         console.log(response)
                     })
