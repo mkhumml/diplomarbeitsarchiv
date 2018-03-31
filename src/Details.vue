@@ -233,6 +233,7 @@
             },
             onSave() {
                 let formData = new FormData();
+                let wasNew = this.diploma.id === null;
                 if (this.diplomaFile !== null) {
                     formData.append("diplomaFile", this.diplomaFile);
                 }
@@ -244,7 +245,7 @@
                 formData.append("diploma", JSON.stringify(this.diploma));
                 axios.post('/diplomarbeitsarchiv/api/diplomarbeiten/', formData, {headers: {'Content-Type': 'multipart/form-data'}})
                     .then(response => {
-                        console.log(response)
+                        // console.log(response);
                         this.diploma.id = response.data.id;
                         this.diploma.title = response.data.title;
                         this.diploma.authors = response.data.authors;
@@ -259,6 +260,9 @@
                         this.$refs.diploma.value = null;
                         this.$refs.attachments.value = null;
                         this.setReadonly(true);
+                        if(wasNew) {
+                            this.$emit('onCreateDiploma', this.diploma);
+                        }
                     })
                     .catch(function (error) {
                         // FIXME Show all AJAX errors in UI and not in browser console

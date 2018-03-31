@@ -40,7 +40,7 @@
                             <span class="icon-plus"
                                   title="Neue Diplomarbeit anlegen"
                                   v-show="!detailVisible"
-                                  @click="onCreateDiploma"></span>
+                                  @click="onBeforeCreateDiploma"></span>
                         </div>
                     </div>
                 </div>
@@ -132,6 +132,7 @@
         </div>
         <app-details v-else-if="detailVisible"
                      class="flz-box" :diploma="selectedDiploma"
+                     @onCreateDiploma="onCreateDiploma($event)"
                      @onDeleteDiploma="onDeleteDiploma($event)"
                      @onCancelCreateDiploma="onCancelCreateDiploma">
         </app-details>
@@ -190,7 +191,7 @@
             onBackToList() {
                 this.detailVisible = false;
             },
-            onCreateDiploma() {
+            onBeforeCreateDiploma() {
                 if (this.loggedIn === true) {
                     this.selectedDiploma = {
                         "id": null,
@@ -200,8 +201,8 @@
                         "departments": [],
                         "year": "",
                         "upload": "",
-                        "summary": [],
-                        "notes": [],
+                        "summary": "",
+                        "notes": "",
                         "attachments": [],
                         "tags": []
                     };
@@ -247,6 +248,10 @@
                     this.searchedDepartments = null,
                     this.searchedTags = null,
                     this.searchedYear = ""
+            },
+            onCreateDiploma(diploma) {
+                // Add to list
+                this.diplomaList.splice(0, 0, diploma);
             },
             onDeleteDiploma(diploma) {
                 // Remove from list
