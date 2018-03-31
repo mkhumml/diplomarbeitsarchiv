@@ -248,15 +248,9 @@
                     this.searchedTags = null,
                     this.searchedYear = ""
             },
-            onDeleteDiploma(e) {
-                axios.post('/diplomarbeitsarchiv/api/diplomarbeiten', this.selectedDiploma)
-                    .then(function (response) {
-                        console.log(response);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-                this.diplomaList.splice((e - 1), 1);
+            onDeleteDiploma(diploma) {
+                // Remove from list
+                this.diplomaList.splice(this.diplomaList.indexOf(diploma), 1);
                 this.detailVisible = false;
             },
             onCancelCreateDiploma() {

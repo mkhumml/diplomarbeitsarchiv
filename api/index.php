@@ -9,7 +9,7 @@ require 'flight/Flight.php';
 session_start();
 $_SESSION["logged"] = 0;
 
-Flight::register('db', 'PDO', array('mysql:host=localhost;port=3306;dbname=mydb', 'root', 'root'), function ($db) {
+Flight::register('db', 'PDO', array('mysql:host=localhost;port=3306;dbname=diplomarbeitsarchiv', 'root', 'root'), function ($db) {
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 });
 
@@ -269,7 +269,8 @@ Flight::route('GET /tags', function () {
  */
 Flight::route('DELETE /diplomarbeiten/@id', function ($id) {
     $conn = Flight::db();
-    // Löschung des Inhaltes der Verbindungstabellen um danach die Dateien im Ordner zu löschen
+
+    // Delete all relations of the diploma
     $sql = "DELETE FROM attachments_has_diploma WHERE diploma_id ='$id'";
     $conn->query($sql);
     $sql = "DELETE FROM authors_has_diploma WHERE diploma_id ='$id'";
@@ -280,28 +281,34 @@ Flight::route('DELETE /diplomarbeiten/@id', function ($id) {
     $conn->query($sql);
     $sql = "DELETE FROM tutors_has_diploma WHERE diploma_id = '$id'";
     $conn->query($sql);
-    //  Löschung vom Attachment im Ordner
+
+    // Delete attachments from upload folder
     $sql = "SELECT * from attachments WHERE diploma_id = '$id'";
-    $sth = $conn->query($sql);
-    $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
-    foreach ($result as $row) {
-        $attachment_name = $row["name"];
-        unlink("../uploads/$attachment_name");
-
+    $stmt = $conn->query($sql);
+    $result = $stmt->fetchAll();
+    foreach($result as $attachment) {
+        $file = realpath("../uploads/" . $attachment['name']);
+        if(is_file($file)) {
+            unlink($file);
+        }
     }
+
+    // Delete attachments
     $sql = "DELETE from attachments WHERE diploma_id = '$id'";
-    $sth = $conn->query($sql);
-    // Löschung vom der Diplomarbeit im Ordner
-    $sql = "SELECT * FROM diploma WHERE id = '$id'";
-    $sth = $conn->query($sql);
-    $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
-    foreach ($result as $row) {
-        $diploma_name = $row["diplomathesis"];
-        unlink("../uploads/$diploma_name");
-    }
-    $sql = "DELETE FROM diploma WHERE id = '$id'";
-    $sth = $conn->query($sql);
+    $conn->query($sql);
 
+    // Delete diploma file from upload folder
+    $sql = "SELECT * FROM diploma WHERE id = '$id'";
+    $stmt = $conn->query($sql);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $file = realpath("../uploads/" . $result["diplomathesis"]);
+    if(is_file($file)) {
+        unlink($file);
+    }
+
+    // Delete diploma
+    $sql = "DELETE FROM diploma WHERE id = '$id'";
+    $conn->query($sql);
 });
 
 /**
@@ -337,244 +344,6 @@ Flight::route('POST /diplomarbeiten', function () {
 
     // Convert diploma array into JSON object
     echo json_encode($diploma);
-
-
-    // Store potentially uploaded diploma file
-    // https://secure.php.net/manual/de/reserved.variables.files.php
-
-    /*        $anzAuthors = count($diploma["authors"]); //Berechne Größe des Arrays $diploma["authors"];
-    $anzTutors = count($diploma["tutors"]);
-    $anzTags = count($diploma["tags"]);
-    $anzDepartments = count($diploma["departments"]);
-*/
-
-
-    /*
-            $sql_select = "SELECT * FROM diploma WHERE diplomathesis = '$name'"; //Lese id raus wo die neue diplomathesis eingetragen wurde mithilfe des filenamen
-            $stmt = $conn->query($sql_select);
-            $row = $stmt->fetch(PDO::FETCH_ASSOC); //Gibt array zurück wo man die Werte auslesen kann aus dem select statement
-            $diploma_id = $row["id"]; //Wird benötigt um bei den Zwischentabellen einzutragen wie z.B. bei Attachments
-    */
-    /*
-            if (array_key_exists("attachments", $_FILES)) { //Attachments einfügen, zuerst geprüft ob es ein attachment gibt
-                $diploma["attachments"] = array();
-                foreach ($_FILES["attachments"]["error"] as $key => $error) {
-                    $name = "";
-                    if ($error == UPLOAD_ERR_OK) {
-                        $tmp_name = $_FILES["attachments"]["tmp_name"][$key];
-                        $name = basename($_FILES["attachments"]["tmp_name"][$key]);
-                        $ext = pathinfo($_FILES["attachments"]["name"][$key], PATHINFO_EXTENSION);
-                        $name = "{$name}.{$ext}";
-                        move_uploaded_file($tmp_name, "$uploads_dir/$name");
-                        // Read file name into diploma data
-                        $org_name = $_FILES["attachments"]["name"][$key];
-                        $sql = "INSERT INTO attachments (name,diploma_id,org_name) VALUES ('" . $name . "','" . $diploma_id . "','" . $org_name . "')";
-                        $conn->query($sql);
-
-                        $sql = "SELECT * FROM attachments WHERE name ='$name'";
-                        $stmt = $conn->query($sql);
-                        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                        $attachment_id = $row["id"];
-                        $sql = "INSERT INTO attachments_has_diploma(attachments_id,diploma_id) values ('" . $attachment_id . "','" . $diploma_id . "')";
-                        $conn->query($sql);
-
-                        array_push($diploma["attachments"], array("id" => $attachment_id, "name" => $_FILES["attachments"]["name"][$key], "tmp_name" => "./uploads/{$name}"));
-
-                    }else{ //Falls Fehler beim Upload der attachments, entferne Eintrag aus der diploma Tabelle sowie die Dateien
-                      // Falls mehrere Attachments schon upgeloadet wurden und erst dann ein Fehler entstanden ist
-                      // müssen diese auch entfernt werden also ... und die Einträge in der tabelle attachments
-                       // sowie attachments_has_diploma
-
-
-                        $sql = "DELETE FROM attachments_has_diploma WHERE diploma_id ='$diploma_id'";
-                        $conn->query($sql);
-
-
-                        $sql = "SELECT * from attachments WHERE diploma_id = '$diploma_id'";
-                        $sth = $conn->query($sql);
-                        $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
-                        foreach ($result as $row) {
-                            $attachment_name = $row["name"];
-                            unlink("../uploads/$attachment_name");
-
-                        }
-                        $sql = "DELETE from attachments WHERE diploma_id = '$diploma_id'";
-                        $sth = $conn->query($sql);
-
-                         // Die hochgeladene Diplomarbeit und der Eintrag in der Tabelle diploma müssen entfernt werden
-                        $sql = "SELECT * FROM diploma WHERE id = '$diploma_id'"; //Entferne die Diplomarbeit
-                        $sth = $conn->query($sql);
-                        $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
-                        foreach ($result as $row) {
-                            $diploma_name = $row["diplomathesis"];
-                            unlink("../uploads/$diploma_name");
-                        }
-
-                        $sql ="DELETE FROM diploma WHERE id = '$diploma_id'";
-                        $conn->query($sql);
-                        die("Error beim Upload von Attachments. Errorcode für das Filearray :".$error);
-                    }
-                }
-            }
-
-            for ($var = 0; $var < $anzAuthors; $var++) {
-                $author_id = $diploma["authors"][$var]["id"];
-
-                foreach ($diploma["authors"][$var] as $stat => $value) {
-
-                    if ($author_id == null) { // Wenn ID net gesetzt, gibt es noch kein DB Eintrag
-
-                        $firstname = $diploma["authors"][$var]["firstname"];
-                        $lastname = $diploma["authors"][$var]["lastname"];
-                        $sql = "INSERT INTO authors(firstname,lastname) values ('" . $firstname . "','" . $lastname . "')";
-                        $conn->query($sql);
-                        $sql = "SELECT * FROM authors WHERE firstname = '$firstname' && lastname = '$lastname'";
-                        $stmt = $conn->query($sql);
-                        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                        $author_id = $row["id"]; //Damit es bei diesem durchgang nicht mehr in die if verzeiweugn reingeht
-                        $sql = "INSERT INTO authors_has_diploma (authors_id,diploma_id) values ('" . $author_id . "','" . $diploma_id . "')";
-                        $conn->query($sql);
-                        $author_id = "hey";
-
-                    } else if ($author_id != "hey") {
-
-                        $sql = "INSERT INTO authors_has_diploma (authors_id,diploma_id) values ('" . $author_id . "','" . $diploma_id . "')";
-                        $conn->query($sql);
-
-                        $author_id = "hey";
-                    }
-                }
-            }
-
-            for ($var = 0; $var < $anzDepartments; $var++) //Zum einfügen von Tutors in die Tabelle
-            {
-                $departments_id = $diploma["departments"][$var]["id"];
-
-
-                foreach ($diploma["departments"][$var] as $stat => $value) {
-
-                    if ($departments_id == null) { // Wenn ID net gesetzt, gibt es noch kein DB Eintrag
-
-
-                        $name = $diploma["departments"][$var]["name"];
-
-                        $sql = "INSERT INTO deparments(name) values ('" . $name . "')";
-                        $conn->query($sql);
-
-                        $sql = "SELECT * FROM deparments WHERE name = '$name'";
-                        $stmt = $conn->query($sql);
-                        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                        $departments_id = $row["id"];
-
-
-                        $sql = "INSERT INTO diploma_has_deparments (diploma_id,deparments_id) values ('" . $diploma_id . "','" . $departments_id . "')";
-                        $conn->query($sql);
-
-
-                        $departments_id = "hey"; //Damit es bei diesem durchgang nicht mehr in die if verzeiweugn reingeht
-
-                    } else if ($departments_id != "hey") {
-                        $sql = "INSERT INTO diploma_has_deparments (diploma_id,deparments_id) values ('" . $diploma_id . "','" . $departments_id . "')";
-                        $conn->query($sql);
-
-                        $departments_id = "hey"; //Damit es bei diesem durchgang nicht mehr in die if verzeiweugn reingeht
-
-                    }
-
-                }
-            }
-
-            for ($var = 0; $var < $anzTutors; $var++) //Zum einfügen von Departments in die tabelle
-            {
-                $tutors_id = $diploma["tutors"][$var]["id"];
-
-                foreach ($diploma["tutors"][$var] as $stat => $value) {
-                    if ($tutors_id == null) { // Wenn ID net gesetzt, gibt es noch kein DB Eintrag
-
-                        $firstname = $diploma["tutors"][$var]["firstname"];
-                        $lastname = $diploma["tutors"][$var]["lastname"];
-
-                        $sql = "INSERT INTO tutors(firstname,lastname) values ('" . $firstname . "','" . $lastname . "')";
-                        $conn->query($sql);
-
-
-                        $sql = "SELECT * FROM tutors WHERE firstname = '$firstname' && lastname ='$lastname'";
-                        $stmt = $conn->query($sql);
-                        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                        $tutors_id = $row["id"];
-
-                        $sql = "INSERT INTO tutors_has_diploma (tutors_id,diploma_id) values ('" . $tutors_id . "','" . $diploma_id . "')";
-                        $conn->query($sql);
-
-
-                        $tutors_id = "hey"; //Damit es bei diesem durchgang nicht mehr in die if verzeiweugn reingeht
-
-                    } else if ($tutors_id != "hey") {
-
-                        $sql = "INSERT INTO tutors_has_diploma (tutors_id,diploma_id) values ('" . $tutors_id . "','" . $diploma_id . "')";
-                        $conn->query($sql);
-                        $tutors_id = "hey"; //Damit es bei diesem durchgang nicht mehr in die if verzeiweugn reingeht
-                    }
-                }
-            }
-
-
-
-            for ($var = 0; $var < $anzTags; $var++) //Zum einfügen von Departments in die tabelle
-            {
-                $tags_id = $diploma["tags"][$var]["id"];
-
-                foreach ($diploma["tags"][$var] as $stat => $value) {
-
-                    if ($tags_id == null) { // Wenn ID net gesetzt, gibt es noch kein DB Eintrag
-
-                        $name = $diploma["tags"][$var]["name"];
-                        $sql = "INSERT INTO tags(name) values ('" . $name . "')";
-                        $conn->query($sql);
-
-
-                        $sql = "SELECT * FROM tags WHERE name = '$name'";
-                        $stmt = $conn->query($sql);
-                        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                        $tags_id = $row["id"];
-
-                        $sql = "INSERT INTO diploma_has_tags (diploma_id,tags_id) values ('" . $diploma_id . "','" . $tags_id . "')";
-                        $conn->query($sql);
-                        $tags_id = "hey"; //Damit es bei diesem durchgang nicht mehr in die if verzeiweugn reingeht
-
-
-                    } else if ($tags_id != "hey") {
-
-
-                        $sql = "INSERT INTO diploma_has_tags (diploma_id,tags_id) values ('" . $diploma_id . "','" . $tags_id . "')";
-                        $conn->query($sql);
-
-                        $tags_id = "hey"; //Damit es bei diesem durchgang nicht mehr in die if verzeiweugn reingeht
-                    }
-                }
-            }
-    */
-
-
-//    } else {
-    /*
-   *
-   *  Hier müsste der Code zum bearbeiten einer bereits bestehen Diplomarbeit stehen wo Veränderungen übernommen werden
-   */
-    /*
-            $d_id = $diploma["id"];
-            $d_title = $diploma["title"];
-            $d_summary = $diploma["summary"];
-            $d_notes = $diploma["notes"];
-            $d_year = $diploma["year"];
-
-            $sql = "UPDATE diploma SET title = '$d_title',summary = '$d_summary', notes = '$d_notes', year = '$d_year' WHERE id = '$d_id'";
-            $conn->query($sql);
-    */
-
-//        echo json_encode($diploma);
-//    }
-
 });
 
 function saveDiploma($conn, &$diploma)
@@ -585,7 +354,7 @@ function saveDiploma($conn, &$diploma)
     $summary = $diploma["summary"];
     $notes = $diploma["notes"];
     if ($diploma["upload"] != '') {
-        $diplomathesis = basename($diploma["upload"]["tmp_name"]) . PHP_EOL;
+        $diplomathesis = basename($diploma["upload"]["tmp_name"]);
         $org_name = $diploma["upload"]["name"];
     } else {
         $diplomathesis = NULL;
@@ -610,10 +379,11 @@ function saveDiploma($conn, &$diploma)
     }
 }
 
-function saveAttachments($conn, &$diploma) {
+function saveAttachments($conn, &$diploma)
+{
     foreach ($diploma["attachments"] as $key => $attachment) {
         $sql = "INSERT INTO attachments (diploma_id, name, org_name) 
-                VALUES ('" . $diploma['id'] . "','" . $attachment['tmp_name'] . "','" . $attachment['name'] . "')";
+                VALUES ('" . $diploma['id'] . "','" . basename($attachment['tmp_name']) . "','" . $attachment['name'] . "')";
         $conn->query($sql);
         $diploma["attachments"][$key]["id"] = $conn->lastInsertId();
 
@@ -626,7 +396,6 @@ function saveAttachments($conn, &$diploma) {
 
 function saveAuthors($conn, &$diploma)
 {
-
     $attachedAuthorIds = [];
 
     // Create and authors

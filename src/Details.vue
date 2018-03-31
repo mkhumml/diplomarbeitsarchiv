@@ -268,7 +268,7 @@
             onDelete() {
                 axios.delete('/diplomarbeitsarchiv/api/diplomarbeiten/' + this.diploma.id)
                     .then(response => {
-                        this.$emit('onDeleteDiploma', response.data)
+                        this.$emit('onDeleteDiploma', this.diploma)
                     })
                     .catch(function (error) {
                         console.log(error);
