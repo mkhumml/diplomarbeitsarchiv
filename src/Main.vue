@@ -202,7 +202,7 @@
                         "upload": "",
                         "summary": [],
                         "notes": [],
-                        "attachments": "",
+                        "attachments": [],
                         "tags": []
                     };
                     this.detailVisible = true;
@@ -297,6 +297,16 @@
             axios.get('/diplomarbeitsarchiv/api/tags')
                 .then(response => {
                     this.optionsTags = response.data;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+        mounted() {
+            axios.get('/diplomarbeitsarchiv/api/diplomarbeiten')
+                .then(response => {
+                    console.log(response.data)
+                    this.diplomaList = response.data;
                 })
                 .catch(function (error) {
                     console.log(error);
