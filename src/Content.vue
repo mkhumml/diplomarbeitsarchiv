@@ -36,7 +36,7 @@
                     {{diploma.notes}}
                 </p>
                 <p>
-                    <button v-on:click="onViewDiploma">Details ansehen</button>
+                    <button v-show="loggedIn" v-on:click="onViewDiploma">Details ansehen</button>
                 </p>
             </div>
             <div class="flz-box flz-5 flz-hide-lte-s flz-nospacer">
@@ -66,6 +66,9 @@
             diploma: {
                 type: Object,
                 required: true
+            },
+            loggedIn: {
+                type: Boolean
             }
         },
         data() {

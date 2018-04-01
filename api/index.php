@@ -1,9 +1,4 @@
 <?php
-/* TODO?
- * Multiselect Listen in der Datenbank - Prüfen ob der Eintrag noch irgenwo Verwendet wird, wenn nicht in der DB löschen
- */
-
-
 require 'flight/Flight.php';
 
 session_start();
@@ -13,18 +8,17 @@ Flight::register('db', 'PDO', array('mysql:host=localhost;port=3306;dbname=diplo
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 });
 
-
 /**
  * Get list of diplomas.
  */
 Flight::route('GET /diplomarbeiten', function () {
 
     $conn = Flight::db();
-    $vorhanden = false;
 
     $sql = "SELECT * from diploma ORDER BY id DESC";
     $sth = $conn->query($sql);
     $result = $sth->fetchAll();
+    $vorhanden = false;
 
     foreach ($result as $row) {
 
@@ -183,12 +177,12 @@ Flight::route('GET /diplomarbeiten', function () {
  */
 Flight::route('GET /authors', function () {
 
+    $authors = [];
     $conn = Flight::db();
     $sql = "SELECT * FROM authors";
     $sth = $conn->query($sql);
     $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
     foreach ($result as $row) {
-
         $id = $row['id'];
         $firstname = $row['firstname'];
         $lastname = $row['lastname'];
@@ -202,13 +196,12 @@ Flight::route('GET /authors', function () {
  */
 Flight::route('GET /tutors', function () {
 
-
+    $tutors = [];
     $conn = Flight::db();
     $sql = "SELECT * FROM tutors";
     $sth = $conn->query($sql);
     $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
     foreach ($result as $row) {
-
         $id = $row['id'];
         $firstname = $row['firstname'];
         $lastname = $row['lastname'];
@@ -222,13 +215,12 @@ Flight::route('GET /tutors', function () {
  */
 Flight::route('GET /departments', function () {
 
-
+    $departments = [];
     $conn = Flight::db();
     $sql = "SELECT * FROM deparments";
     $sth = $conn->query($sql);
     $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
     foreach ($result as $row) {
-
         $id = $row['id'];
         $name = $row['name'];
         $departments[] = array('id' => $id, 'name' => $name);
@@ -241,22 +233,17 @@ Flight::route('GET /departments', function () {
  */
 Flight::route('GET /tags', function () {
 
-
+    $tags = [];
     $conn = Flight::db();
     $sql = "SELECT * FROM tags";
     $sth = $conn->query($sql);
     $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
-
     foreach ($result as $row) {
-
         $id = $row['id'];
         $name = $row['name'];
         $tags[] = array('id' => $id, 'name' => $name);
-
     }
     echo json_encode($tags);
-
-
 });
 
 /*Flight::route('GET /diplomarbeiten/@id', function ($id) {
@@ -323,8 +310,8 @@ Flight::route('POST /diplomarbeiten', function () {
     $diploma = json_decode($_POST["diploma"], true);
 
     // Save uploaded diploma file
-    persistDiplomaFile($diploma);
-    persistAttachmentFiles($diploma);
+    saveDiplomaFile($diploma);
+    saveAttachmentsFiles($diploma);
 
     // Save diploma in database
     // FIXME Transaktionsklammer!!!!
@@ -345,248 +332,6 @@ Flight::route('POST /diplomarbeiten', function () {
     // Convert diploma array into JSON object
     echo json_encode($diploma);
 });
-
-function saveDiploma($conn, &$diploma)
-{
-    $id = $diploma["id"];
-    $title = $diploma["title"];
-    $year = $diploma["year"];
-    $summary = $diploma["summary"];
-    $notes = $diploma["notes"];
-    if ($diploma["upload"] != '') {
-        $diplomathesis = basename($diploma["upload"]["tmp_name"]);
-        $org_name = $diploma["upload"]["name"];
-    } else {
-        $diplomathesis = NULL;
-        $org_name = NULL;
-    }
-
-    if ($diploma["id"] == null) {
-        // Create new diploma
-        $sql = "INSERT INTO diploma (title, year, summary, notes, diplomathesis, org_name) 
-                VALUES ('" . $title . "','" . $year . "','" . $summary . "','" . $notes . "','" . $diplomathesis . "','" . $org_name . "')";
-        $conn->query($sql);
-
-        // Get id of created diploma
-        $id = $conn->lastInsertId();
-        $diploma["id"] = $id;
-    } else {
-        // Update existing diploma
-        $sql = "UPDATE diploma 
-                SET title = '$title', year = '$year', summary = '$summary', notes = '$notes', diplomathesis = '$diplomathesis', org_name = '$org_name'  
-                WHERE id = '$id'";
-        $conn->query($sql);
-    }
-}
-
-function saveAttachments($conn, &$diploma)
-{
-    foreach ($diploma["attachments"] as $key => $attachment) {
-        $sql = "INSERT INTO attachments (diploma_id, name, org_name) 
-                VALUES ('" . $diploma['id'] . "','" . basename($attachment['tmp_name']) . "','" . $attachment['name'] . "')";
-        $conn->query($sql);
-        $diploma["attachments"][$key]["id"] = $conn->lastInsertId();
-
-        // FIXME - Tabelle eigentlich unnötig da nicht m:n sondern nur 1:n notwendig!
-        $sql = "INSERT INTO attachments_has_diploma (diploma_id, attachments_id) 
-                VALUES ('" . $diploma['id'] . "','" . $diploma["attachments"][$key]["id"] . "')";
-        $conn->query($sql);
-    }
-}
-
-function saveAuthors($conn, &$diploma)
-{
-    $attachedAuthorIds = [];
-
-    // Create and authors
-    foreach ($diploma["authors"] as $key => $author) {
-        $id = $author['id'];
-        if ($id == null) {
-            // Add new author
-            $sql = "INSERT INTO authors(firstname, lastname) VALUES ('" . $author['firstname'] . "','" . $author['lastname'] . "')";
-            $conn->query($sql);
-            $id = $conn->lastInsertId();
-            $diploma["authors"][$key]["id"] = $id;
-        }
-        array_push($attachedAuthorIds, $id);
-
-        // Check if author is already attached to diploma
-        $sql = "SELECT * FROM authors_has_diploma WHERE diploma_id = " . $diploma['id'] . " AND authors_id = " . $id;
-        $stmt = $conn->query($sql);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$row) {
-            // Attach author to diploma
-            $sql = "INSERT INTO authors_has_diploma(diploma_id, authors_id) 
-                    VALUES (" . $diploma["id"] . "," . $id . ")";
-            $conn->query($sql);
-        }
-    }
-
-    // Detach authors
-    if (sizeof($attachedAuthorIds) > 0) {
-        $sql = "DELETE FROM authors_has_diploma WHERE diploma_id = " . $diploma['id'] . " AND authors_id NOT IN(" . implode(",", $attachedAuthorIds) . ")";
-        $conn->query($sql);
-    }
-}
-
-function saveTutors($conn, &$diploma)
-{
-    $attachedTutorIds = [];
-    // Create and tutors
-    foreach ($diploma["tutors"] as $key => $tutor) {
-        $id = $tutor['id'];
-        if ($id == null) {
-            // Add new tutor
-            $sql = "INSERT INTO tutors(firstname, lastname) VALUES ('" . $tutor['firstname'] . "','" . $tutor['lastname'] . "')";
-            $conn->query($sql);
-            $id = $conn->lastInsertId();
-            $diploma["tutors"][$key]["id"] = $id;
-        }
-        array_push($attachedTutorIds, $id);
-
-        // Check if tutor is already attached to diploma
-        $sql = "SELECT * FROM tutors_has_diploma WHERE diploma_id = " . $diploma['id'] . " AND tutors_id = " . $id;
-        $stmt = $conn->query($sql);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$row) {
-            // Attach tutor to diploma
-            $sql = "INSERT INTO tutors_has_diploma(diploma_id, tutors_id) 
-                    VALUES (" . $diploma["id"] . "," . $id . ")";
-            $conn->query($sql);
-        }
-    }
-    // Detach tutors
-    if (sizeof($attachedTutorIds) > 0) {
-        $sql = "DELETE FROM tutors_has_diploma WHERE diploma_id = " . $diploma['id'] . " AND tutors_id NOT IN(" . implode(",", $attachedTutorIds) . ")";
-        $conn->query($sql);
-    }
-}
-
-function saveDepartments($conn, &$diploma)
-{
-    $attachedDepartmentIds = [];
-    // Create and department
-    foreach ($diploma["departments"] as $key => $department) {
-        $id = $department['id'];
-        if ($id == null) {
-            // Add new department
-            $sql = "INSERT INTO deparments(name) VALUES ('" . $department['name'] . "')";
-            $conn->query($sql);
-            $id = $conn->lastInsertId();
-            $diploma["departments"][$key]["id"] = $id;
-        }
-        array_push($attachedDepartmentIds, $id);
-
-        // Check if department is already attached to diploma
-        $sql = "SELECT * FROM diploma_has_deparments WHERE diploma_id = " . $diploma['id'] . " AND deparments_id = " . $id;
-        $stmt = $conn->query($sql);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$row) {
-            // Attach department to diploma
-            $sql = "INSERT INTO diploma_has_deparments(diploma_id, deparments_id) 
-                    VALUES (" . $diploma["id"] . "," . $id . ")";
-            $conn->query($sql);
-        }
-    }
-
-    // Detach department
-    if (sizeof($attachedDepartmentIds) > 0) {
-        $sql = "DELETE FROM diploma_has_deparments WHERE diploma_id = " . $diploma['id'] . " AND deparments_id NOT IN(" . implode(",", $attachedDepartmentIds) . ")";
-        $conn->query($sql);
-    }
-}
-
-
-function saveTags($conn, &$diploma)
-{
-    $attachedTagIds = [];
-    // Create and department
-    foreach ($diploma["tags"] as $key => $tag) {
-        $id = $tag['id'];
-        if ($id == null) {
-            // Add new tag
-            $sql = "INSERT INTO tags(name) VALUES ('" . $tag['name'] . "')";
-            $conn->query($sql);
-            $id = $conn->lastInsertId();
-            $diploma["tags"][$key]["id"] = $id;
-        }
-        array_push($attachedTagIds, $id);
-
-        // Check if tag is already attached to diploma
-        $sql = "SELECT * FROM diploma_has_tags WHERE diploma_id = " . $diploma['id'] . " AND tags_id = " . $id;
-        $stmt = $conn->query($sql);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$row) {
-            // Attach tag to diploma
-            $sql = "INSERT INTO diploma_has_tags(diploma_id, tags_id) 
-                    VALUES (" . $diploma["id"] . "," . $id . ")";
-            $conn->query($sql);
-        }
-    }
-
-    // Detach department
-    if (sizeof($attachedTagIds) > 0) {
-        $sql = "DELETE FROM diploma_has_tags WHERE diploma_id = " . $diploma['id'] . " AND tags_id NOT IN(" . implode(",", $attachedTagIds) . ")";
-        $conn->query($sql);
-    }
-}
-
-function saveFile(&$diploma, $fileName, $tmp_name, $attachment)
-{
-
-    // Create upload directory if not available
-    $uploads_dir = '../uploads';
-    if (!is_dir($uploads_dir)) {
-        mkdir($uploads_dir);
-    }
-
-    // Get name of file
-    $diploma_file_name = $fileName;
-
-    // Get temporary name of file used for storage
-    $orig_tmp_name = $tmp_name;
-
-    // Combine temporary name of file with extension of orginal file name
-    $diploma_file_tmp_name = basename($tmp_name);
-    $ext = pathinfo($fileName, PATHINFO_EXTENSION);
-    $diploma_file_tmp_name = "{$diploma_file_tmp_name}.{$ext}";
-
-    // Rename uploaded file for storage
-    move_uploaded_file($orig_tmp_name, "$uploads_dir/$diploma_file_tmp_name");
-
-    // Add file names in diploma object
-    if ($attachment) {
-        $diploma["attachments"][] = array("id" => NULL, "name" => $diploma_file_name, "tmp_name" => "./uploads/{$diploma_file_tmp_name}");
-    } else {
-        $diploma["upload"] = array("name" => $diploma_file_name, "tmp_name" => "./uploads/{$diploma_file_tmp_name}");
-    }
-}
-
-function persistDiplomaFile(&$diploma)
-{
-    if (array_key_exists("diplomaFile", $_FILES)) {
-        if ($_FILES["diplomaFile"]["error"] == UPLOAD_ERR_OK) {
-            saveFile($diploma, $_FILES["diplomaFile"]["name"], $_FILES["diplomaFile"]["tmp_name"], false);
-        } else {
-            $error = $_FILES["diplomaFile"]["error"];
-            die("Fehler beim Upload der Diplomarbeit. \nErrorcode für das Filearray: '$error'"); // FIXME
-        }
-    }
-}
-
-function persistAttachmentFiles(&$diploma)
-{
-    if (array_key_exists("attachments", $_FILES)) { //Attachments einfügen, zuerst geprüft ob es ein attachment gibt
-        foreach ($_FILES["attachments"]["error"] as $key => $error) {
-            if ($error == UPLOAD_ERR_OK) {
-                saveFile($diploma, $_FILES["attachments"]["name"][$key], $_FILES["attachments"]["tmp_name"][$key], true);
-            } else {
-                $error = $_FILES["diplomaFile"]["error"];
-                die("Fehler beim Upload des Anhangs. \nErrorcode für das Filearray: '$error'"); // FIXME
-            }
-        }
-    }
-}
 
 Flight::route('POST /login', function () {
 
@@ -612,7 +357,6 @@ Flight::route('POST /login', function () {
     }
 
 });
-
 
 Flight::route('GET /logout', function () {
     $_SESSION["logged"] = 0;
@@ -730,21 +474,18 @@ Flight::route('POST /extendedFilter', function () {
 
 });
 
-
 Flight::route('POST /search', function () {
     $conn = Flight::db();
     $json = file_get_contents("php://input");
     $search = json_decode($json, true);
     $title_s = $search["name"];
-    /*** Anfang - Geändert von Markus ***/
     $tags = [];
     $authors = [];
     $tutors = [];
     $departments = [];
     $attachments = [];
-    /*** Ende - Geändert von Markus ***/
 
-    $sql = "SELECT * FROM diploma WHERE title = '$title_s'";
+    $sql = "SELECT * FROM diploma WHERE title LIKE '%$title_s%'";
     $sth = $conn->query($sql);
     $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
 
@@ -910,6 +651,247 @@ Flight::route('POST /resetpassword', function () {
 
 
 });
+
+function saveDiploma($conn, &$diploma)
+{
+    $id = $diploma["id"];
+    $title = $diploma["title"];
+    $year = $diploma["year"];
+    $summary = $diploma["summary"];
+    $notes = $diploma["notes"];
+    if ($diploma["upload"] !== null) {
+        $diplomathesis = basename($diploma["upload"]["tmp_name"]);
+        $org_name = $diploma["upload"]["name"];
+    } else {
+        $diplomathesis = NULL;
+        $org_name = NULL;
+    }
+
+    if ($diploma["id"] == null) {
+        // Create new diploma
+        $sql = "INSERT INTO diploma (title, year, summary, notes, diplomathesis, org_name) 
+                VALUES ('" . $title . "','" . $year . "','" . $summary . "','" . $notes . "','" . $diplomathesis . "','" . $org_name . "')";
+        $conn->query($sql);
+
+        // Get id of created diploma
+        $id = $conn->lastInsertId();
+        $diploma["id"] = $id;
+    } else {
+        // Update existing diploma
+        $sql = "UPDATE diploma 
+                SET title = '$title', year = '$year', summary = '$summary', notes = '$notes', diplomathesis = '$diplomathesis', org_name = '$org_name'  
+                WHERE id = '$id'";
+        $conn->query($sql);
+    }
+}
+
+function saveAttachments($conn, &$diploma)
+{
+    foreach ($diploma["attachments"] as $key => $attachment) {
+        $sql = "INSERT INTO attachments (diploma_id, name, org_name) 
+                VALUES ('" . $diploma['id'] . "','" . basename($attachment['tmp_name']) . "','" . $attachment['name'] . "')";
+        $conn->query($sql);
+        $diploma["attachments"][$key]["id"] = $conn->lastInsertId();
+
+        // FIXME - Tabelle unnötig da 1:n nicht n:m
+        $sql = "INSERT INTO attachments_has_diploma (diploma_id, attachments_id) 
+                VALUES ('" . $diploma['id'] . "','" . $diploma["attachments"][$key]["id"] . "')";
+        $conn->query($sql);
+    }
+}
+
+function saveAuthors($conn, &$diploma)
+{
+    $attachedAuthorIds = [];
+
+    // Create and authors
+    foreach ($diploma["authors"] as $key => $author) {
+        $id = $author['id'];
+        if ($id == null) {
+            // Add new author
+            $sql = "INSERT INTO authors(firstname, lastname) VALUES ('" . $author['firstname'] . "','" . $author['lastname'] . "')";
+            $conn->query($sql);
+            $id = $conn->lastInsertId();
+            $diploma["authors"][$key]["id"] = $id;
+        }
+        array_push($attachedAuthorIds, $id);
+
+        // Check if author is already attached to diploma
+        $sql = "SELECT * FROM authors_has_diploma WHERE diploma_id = " . $diploma['id'] . " AND authors_id = " . $id;
+        $stmt = $conn->query($sql);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
+            // Attach author to diploma
+            $sql = "INSERT INTO authors_has_diploma(diploma_id, authors_id) 
+                    VALUES (" . $diploma["id"] . "," . $id . ")";
+            $conn->query($sql);
+        }
+    }
+
+    // Detach authors
+    if (sizeof($attachedAuthorIds) > 0) {
+        $sql = "DELETE FROM authors_has_diploma WHERE diploma_id = " . $diploma['id'] . " AND authors_id NOT IN(" . implode(",", $attachedAuthorIds) . ")";
+        $conn->query($sql);
+    }
+}
+
+function saveTutors($conn, &$diploma)
+{
+    $attachedTutorIds = [];
+    // Create and tutors
+    foreach ($diploma["tutors"] as $key => $tutor) {
+        $id = $tutor['id'];
+        if ($id == null) {
+            // Add new tutor
+            $sql = "INSERT INTO tutors(firstname, lastname) VALUES ('" . $tutor['firstname'] . "','" . $tutor['lastname'] . "')";
+            $conn->query($sql);
+            $id = $conn->lastInsertId();
+            $diploma["tutors"][$key]["id"] = $id;
+        }
+        array_push($attachedTutorIds, $id);
+
+        // Check if tutor is already attached to diploma
+        $sql = "SELECT * FROM tutors_has_diploma WHERE diploma_id = " . $diploma['id'] . " AND tutors_id = " . $id;
+        $stmt = $conn->query($sql);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
+            // Attach tutor to diploma
+            $sql = "INSERT INTO tutors_has_diploma(diploma_id, tutors_id) 
+                    VALUES (" . $diploma["id"] . "," . $id . ")";
+            $conn->query($sql);
+        }
+    }
+    // Detach tutors
+    if (sizeof($attachedTutorIds) > 0) {
+        $sql = "DELETE FROM tutors_has_diploma WHERE diploma_id = " . $diploma['id'] . " AND tutors_id NOT IN(" . implode(",", $attachedTutorIds) . ")";
+        $conn->query($sql);
+    }
+}
+
+function saveDepartments($conn, &$diploma)
+{
+    $attachedDepartmentIds = [];
+    // Create and department
+    foreach ($diploma["departments"] as $key => $department) {
+        $id = $department['id'];
+        if ($id == null) {
+            // Add new department
+            $sql = "INSERT INTO deparments(name) VALUES ('" . $department['name'] . "')";
+            $conn->query($sql);
+            $id = $conn->lastInsertId();
+            $diploma["departments"][$key]["id"] = $id;
+        }
+        array_push($attachedDepartmentIds, $id);
+
+        // Check if department is already attached to diploma
+        $sql = "SELECT * FROM diploma_has_deparments WHERE diploma_id = " . $diploma['id'] . " AND deparments_id = " . $id;
+        $stmt = $conn->query($sql);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
+            // Attach department to diploma
+            $sql = "INSERT INTO diploma_has_deparments(diploma_id, deparments_id) 
+                    VALUES (" . $diploma["id"] . "," . $id . ")";
+            $conn->query($sql);
+        }
+    }
+
+    // Detach department
+    if (sizeof($attachedDepartmentIds) > 0) {
+        $sql = "DELETE FROM diploma_has_deparments WHERE diploma_id = " . $diploma['id'] . " AND deparments_id NOT IN(" . implode(",", $attachedDepartmentIds) . ")";
+        $conn->query($sql);
+    }
+}
+
+function saveTags($conn, &$diploma)
+{
+    $attachedTagIds = [];
+    // Create and department
+    foreach ($diploma["tags"] as $key => $tag) {
+        $id = $tag['id'];
+        if ($id == null) {
+            // Add new tag
+            $sql = "INSERT INTO tags(name) VALUES ('" . $tag['name'] . "')";
+            $conn->query($sql);
+            $id = $conn->lastInsertId();
+            $diploma["tags"][$key]["id"] = $id;
+        }
+        array_push($attachedTagIds, $id);
+
+        // Check if tag is already attached to diploma
+        $sql = "SELECT * FROM diploma_has_tags WHERE diploma_id = " . $diploma['id'] . " AND tags_id = " . $id;
+        $stmt = $conn->query($sql);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
+            // Attach tag to diploma
+            $sql = "INSERT INTO diploma_has_tags(diploma_id, tags_id) 
+                    VALUES (" . $diploma["id"] . "," . $id . ")";
+            $conn->query($sql);
+        }
+    }
+
+    // Detach tag
+    if (sizeof($attachedTagIds) > 0) {
+        $sql = "DELETE FROM diploma_has_tags WHERE diploma_id = " . $diploma['id'] . " AND tags_id NOT IN(" . implode(",", $attachedTagIds) . ")";
+        $conn->query($sql);
+    }
+}
+
+function saveFile(&$diploma, $fileName, $tmp_name, $attachment)
+{
+    // Create upload directory if not available
+    $uploads_dir = '../uploads';
+    if (!is_dir($uploads_dir)) {
+        mkdir($uploads_dir);
+    }
+
+    // Get name of file
+    $diploma_file_name = $fileName;
+
+    // Get temporary name of file used for storage
+    $orig_tmp_name = $tmp_name;
+
+    // Combine temporary name of file with extension of original file name
+    $diploma_file_tmp_name = basename($tmp_name);
+    $ext = pathinfo($fileName, PATHINFO_EXTENSION);
+    $diploma_file_tmp_name = "{$diploma_file_tmp_name}.{$ext}";
+
+    // Rename uploaded file for storage
+    move_uploaded_file($orig_tmp_name, "$uploads_dir/$diploma_file_tmp_name");
+
+    // Add file names in diploma object
+    if ($attachment) {
+        $diploma["attachments"][] = array("id" => NULL, "name" => $diploma_file_name, "tmp_name" => "$uploads_dir/$diploma_file_tmp_name");
+    } else {
+        $diploma["upload"] = array("name" => $diploma_file_name, "tmp_name" => "$uploads_dir/$diploma_file_tmp_name");
+    }
+}
+
+function saveDiplomaFile(&$diploma)
+{
+    if (array_key_exists("diplomaFile", $_FILES)) {
+        if ($_FILES["diplomaFile"]["error"] == UPLOAD_ERR_OK) {
+            saveFile($diploma, $_FILES["diplomaFile"]["name"], $_FILES["diplomaFile"]["tmp_name"], false);
+        } else {
+            $error = $_FILES["diplomaFile"]["error"];
+            die("Fehler beim Upload der Diplomarbeit. \nErrorcode für das Filearray: '$error'"); // FIXME
+        }
+    }
+}
+
+function saveAttachmentsFiles(&$diploma)
+{
+    if (array_key_exists("attachments", $_FILES)) { //Attachments einfügen, zuerst geprüft ob es ein attachment gibt
+        foreach ($_FILES["attachments"]["error"] as $key => $error) {
+            if ($error == UPLOAD_ERR_OK) {
+                saveFile($diploma, $_FILES["attachments"]["name"][$key], $_FILES["attachments"]["tmp_name"][$key], true);
+            } else {
+                $error = $_FILES["diplomaFile"]["error"];
+                die("Fehler beim Upload des Anhangs. \nErrorcode für das Filearray: '$error'"); // FIXME
+            }
+        }
+    }
+}
+
 
 Flight::start();
 ?>

@@ -74,7 +74,7 @@
         <div class="flz-box flz-nospacer">
             <div class="flz-box flz-50 flz-100-lte-xs">
                 <label for="diplomarbeit">Diplomarbeit</label>
-                <div v-if="this.diploma.upload.tmp_name !== null" class="flz-box attachments flz-nospacer">
+                <div v-if="this.diploma.upload !== null" class="flz-box attachments flz-nospacer">
                     <a v-bind:href="diploma.upload.tmp_name" target="_blank">{{diploma.upload.name}}</a>
                 </div>
                 <input id="diplomarbeit" type="file" id="file" value="" ref="diploma" v-on:change="onDiplomaSelected"

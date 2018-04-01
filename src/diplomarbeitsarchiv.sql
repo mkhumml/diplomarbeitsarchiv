@@ -32,6 +32,9 @@ CREATE TABLE IF NOT EXISTS `diplomarbeitsarchiv`.`diploma` (
 ENGINE = InnoDB;
 
 
+
+
+
 -- -----------------------------------------------------
 -- Table `diplomarbeitsarchiv`.`attachments`
 -- -----------------------------------------------------
@@ -49,6 +52,11 @@ CREATE TABLE IF NOT EXISTS `diplomarbeitsarchiv`.`attachments` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+--
+-- Indizes für die Tabelle `diploma`
+--
+ALTER TABLE `diploma`
+  ADD KEY `diploma_title_idx` (`title`(255));
 
 -- -----------------------------------------------------
 -- Table `diplomarbeitsarchiv`.`authors`

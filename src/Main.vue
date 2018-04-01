@@ -36,7 +36,7 @@
                                v-if="extendedFilter">
                                 Erweiterte Suche schließen</a>
                         </div>
-                        <div class="iconbar">
+                        <div class="iconbar" v-show="loggedIn">
                             <span class="icon-plus"
                                   title="Neue Diplomarbeit anlegen"
                                   v-show="!detailVisible"
@@ -125,7 +125,8 @@
                 <div class="flz-box content"
                      v-for="diploma in diplomaList">
                     <app-content :diploma="diploma"
-                                 @onSelectDiploma="onSelectDiploma($event)">
+                                 @onSelectDiploma="onSelectDiploma($event)"
+                                 :loggedIn="loggedIn">
                     </app-content>
                 </div>
             </div>
@@ -200,7 +201,7 @@
                         "tutors": [],
                         "departments": [],
                         "year": "",
-                        "upload": "",
+                        "upload": null,
                         "summary": "",
                         "notes": "",
                         "attachments": [],
@@ -216,12 +217,12 @@
                     name: this.search
                 })
                     .then(response => {
+                        console.log(response)
                         this.diplomaList = response.data;
                     });
             },
             onExtendedFilter() {
                 this.searchedDiploma = {
-                    "id": null,
                     "authors": [],
                     "tutors": [],
                     "departments": [],
