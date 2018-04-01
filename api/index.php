@@ -14,15 +14,336 @@ Flight::register('db', 'PDO', array('mysql:host=localhost;port=3306;dbname=diplo
 Flight::route('GET /diplomarbeiten', function () {
 
     $conn = Flight::db();
-
     $sql = "SELECT * from diploma ORDER BY id DESC";
     $sth = $conn->query($sql);
     $result = $sth->fetchAll();
-    $vorhanden = false;
+    $diplomas = readDiplomas($conn, $result);
+    if (sizeof($diplomas) == 0) {
+        $diplomas[] = array('id' => "", 'title' => "Keine Diplomarbeit gefunden", 'authors' => "", 'tutors' => "", 'departments' => "", 'year' => "", 'upload' => "", 'summary' => "", 'notes' => "", 'attachments' => "", 'tags' => "");
+    }
+    echo json_encode($diplomas);
+});
 
+/*Flight::route('GET /users', function () {
+    $users[] = array('id' => "2", 'email' => 'stefan', 'password' => 'stefan');
+    $users[] = array('id' => "1", 'email' => 'markus', 'password' => 'markus');
+    $users[] = array('id' => "3", 'email' => 'sebi', 'password' => 'sebi');
+    $users[] = array('id' => "4", 'email' => 'karl', 'password' => 'karl');
+    echo json_encode($users);
+});*/
+
+/**
+ * Get list of authors.
+ */
+Flight::route('GET /authors', function () {
+
+    $authors = [];
+    $conn = Flight::db();
+    $sql = "SELECT * FROM authors";
+    $sth = $conn->query($sql);
+    $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
     foreach ($result as $row) {
+        $id = $row['id'];
+        $firstname = $row['firstname'];
+        $lastname = $row['lastname'];
+        $authors[] = array('id' => $id, 'firstname' => $firstname, 'lastname' => $lastname);
+    }
+    echo json_encode($authors);
+});
 
-        $vorhanden = true;
+/**
+ * Get list of tutors.
+ */
+Flight::route('GET /tutors', function () {
+
+    $tutors = [];
+    $conn = Flight::db();
+    $sql = "SELECT * FROM tutors";
+    $sth = $conn->query($sql);
+    $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
+    foreach ($result as $row) {
+        $id = $row['id'];
+        $firstname = $row['firstname'];
+        $lastname = $row['lastname'];
+        $tutors[] = array('id' => $id, 'firstname' => $firstname, 'lastname' => $lastname);
+    }
+    echo json_encode($tutors);
+});
+
+/**
+ * Get list of departments.
+ */
+Flight::route('GET /departments', function () {
+
+    $departments = [];
+    $conn = Flight::db();
+    $sql = "SELECT * FROM deparments";
+    $sth = $conn->query($sql);
+    $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
+    foreach ($result as $row) {
+        $id = $row['id'];
+        $name = $row['name'];
+        $departments[] = array('id' => $id, 'name' => $name);
+    }
+    echo json_encode($departments);
+});
+
+/**
+ * Get list of tags.
+ */
+Flight::route('GET /tags', function () {
+
+    $tags = [];
+    $conn = Flight::db();
+    $sql = "SELECT * FROM tags";
+    $sth = $conn->query($sql);
+    $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
+    foreach ($result as $row) {
+        $id = $row['id'];
+        $name = $row['name'];
+        $tags[] = array('id' => $id, 'name' => $name);
+    }
+    echo json_encode($tags);
+});
+
+/*Flight::route('GET /diplomarbeiten/@id', function ($id) {
+    $arr1 = array('id' => $id, 'title' => "title1", 'author' => "author1", 'tutor' => "tutor1", 'departments' => "department1", 'year' => "jahr1", 'upload' => "diplomathesispdf1", 'summary' => "summary1", 'attachments' => "attachments1", 'tags' => "tags1");
+    echo json_encode($arr1);
+});*/
+
+/**
+ * Delete diploma
+ */
+Flight::route('DELETE /diplomarbeiten/@id', function ($id) {
+    $conn = Flight::db();
+
+    // Delete all relations of the diploma
+    $sql = "DELETE FROM attachments_has_diploma WHERE diploma_id ='$id'";
+    $conn->query($sql);
+    $sql = "DELETE FROM authors_has_diploma WHERE diploma_id ='$id'";
+    $conn->query($sql);
+    $sql = "DELETE FROM diploma_has_deparments WHERE diploma_id = '$id'";
+    $conn->query($sql);
+    $sql = "DELETE FROM diploma_has_tags WHERE diploma_id = '$id'";
+    $conn->query($sql);
+    $sql = "DELETE FROM tutors_has_diploma WHERE diploma_id = '$id'";
+    $conn->query($sql);
+
+    // Delete attachments from upload folder
+    $sql = "SELECT * from attachments WHERE diploma_id = '$id'";
+    $stmt = $conn->query($sql);
+    $result = $stmt->fetchAll();
+    foreach ($result as $attachment) {
+        $file = realpath("../uploads/" . $attachment['name']);
+        if (is_file($file)) {
+            unlink($file);
+        }
+    }
+
+    // Delete attachments
+    $sql = "DELETE from attachments WHERE diploma_id = '$id'";
+    $conn->query($sql);
+
+    // Delete diploma file from upload folder
+    $sql = "SELECT * FROM diploma WHERE id = '$id'";
+    $stmt = $conn->query($sql);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $file = realpath("../uploads/" . $result["diplomathesis"]);
+    if (is_file($file)) {
+        unlink($file);
+    }
+
+    // Delete diploma
+    $sql = "DELETE FROM diploma WHERE id = '$id'";
+    $conn->query($sql);
+});
+
+/**
+ * Save diploma (create and update)
+ */
+Flight::route('POST /diplomarbeiten', function () {
+
+    // Connect to database
+    $conn = Flight::db();
+
+    // Convert JSON object into diploma array
+    $diploma = json_decode($_POST["diploma"], true);
+
+    // Save uploaded diploma file
+    saveDiplomaFile($diploma);
+    saveAttachmentsFiles($diploma);
+
+    // Save diploma in database
+    // FIXME Transaktionsklammer!!!!
+    try {
+        $conn->beginTransaction();
+        saveDiploma($conn, $diploma);
+        saveAttachments($conn, $diploma);
+        saveAuthors($conn, $diploma);
+        saveTutors($conn, $diploma);
+        saveDepartments($conn, $diploma);
+        saveTags($conn, $diploma);
+        $conn->commit();
+    } catch (Exception $e) {
+        $conn->rollback();
+        die("Fehler beim Speichern der Diplomarbeit:" . $e);
+    }
+
+    // Convert diploma array into JSON object
+    echo json_encode($diploma);
+});
+
+Flight::route('POST /login', function () {
+
+
+    $conn = Flight::db();
+
+    $json = file_get_contents("php://input");
+    $users = json_decode($json, true);
+
+    $password = hash("sha512", $users["password"]);
+    $email = $users["email"];
+
+
+    $sql = "SELECT * FROM users WHERE email ='" . $email . "' AND password ='" . $password . "'"; //SQL Statement zum suchen aller Einträge die mit der eingegebenen email übereinstimmen
+    $res = $conn->query($sql);
+    if ($res->fetchColumn() > 0) { // Wenn Die Anzahl der rows größer als 0 ist, gibt es ein Eintrag in der DB und somit login :)
+        // Session Variable login wird auf 1 gesetzt wenn user erfolgreich eingeloggt sonst ist sie 0
+        echo("1");
+        $_SESSION["logged"] = 1;
+    } else {
+        echo("0");
+
+    }
+
+});
+
+Flight::route('GET /logout', function () {
+    $_SESSION["logged"] = 0;
+    echo(0); // 0 = false also ausgeloggt, 1 = true eingeloggt
+    session_unset();
+    session_destroy();
+});
+
+Flight::route('POST /register', function () {
+    $conn = Flight::db();
+    $json = file_get_contents("php://input");
+    $users = json_decode($json, true);
+    $email = $users["email"];
+    $password = $users["password"];
+    $password = hash("sha512", $users["password"]);
+    $sql = "SELECT * FROM users WHERE email = '" . $email . "'";
+    $res = $conn->query($sql); // Führer SQL Statement aus und speicher ergebnis ( Objekt falls vorhanden in $res )
+    if ($res->fetchColumn() > 0) { //Falls Eintrag vorhanden dann wird email bereits verwendet
+        echo "0";
+    } else {
+        $insert = "INSERT INTO users( email, password) VALUES ('" . $email . "','" . $password . "')";
+        if ($conn->query($insert) == true) {
+            echo "1";
+        } else {
+            echo "0";
+        }
+
+    }
+
+});
+
+/**
+ * Extended search.
+ */
+Flight::route('POST /extendedFilter', function () {
+
+    $json = file_get_contents("php://input");
+    $extendedFilter = json_decode($json, true);
+
+    $conn = Flight::db();
+
+    // TODO Other filters (combine only items which are in BOTH results)
+    $diplomasByTags = getDiplomasByTags($conn, $extendedFilter);
+
+    if (sizeof($diplomasByTags) == 0) {
+        $diplomas[] = array('id' => "", 'title' => "Keine Diplomarbeit gefunden", 'authors' => "", 'tutors' => "", 'departments' => "", 'year' => "", 'upload' => "", 'summary' => "", 'notes' => "", 'attachments' => "", 'tags' => "");
+    }
+    echo json_encode($diplomasByTags);
+});
+
+Flight::route('POST /search', function () {
+
+    $json = file_get_contents("php://input");
+    $search = json_decode($json, true);
+    $title_s = $search["name"];
+
+    $conn = Flight::db();
+    $sql = "SELECT * FROM diploma WHERE title LIKE '%$title_s%'";
+    $sth = $conn->query($sql);
+    $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
+    $diplomas = readDiplomas($conn, $result);
+    if (sizeof($diplomas) == 0) {
+        $diplomas[] = array('id' => "", 'title' => "Keine Diplomarbeit gefunden", 'authors' => "", 'tutors' => "", 'departments' => "", 'year' => "", 'upload' => "", 'summary' => "", 'notes' => "", 'attachments' => "", 'tags' => "");
+    }
+    echo json_encode($diplomas);
+});
+
+Flight::route('POST /resetpassword', function () {
+
+    $conn = Flight::db();
+    $json = file_get_contents("php://input");
+    $reset = json_decode($json, true);
+
+    $from = "diplomarbeitsarchiv@htl-donaustadt.at";
+    $email = $reset["email"];
+    $sql = "SELECT * FROM users WHERE email = '$email'";
+    $res = $conn->query($sql);
+    if ($res->fetchColumn() > 0) {
+        $password = substr(md5(uniqid(rand(), 1)), 3, 10); // Geniere ein neues 10 Zeichen langes Passwort
+        echo $password;
+        $password = hash("sha512", $password);
+        mail($email, "Passwort Reset", "Ihr neues Passwort lautet : " . $password, $from); // Problem hier, mails kommen nicht an
+        $sql = "UPDATE users SET password ='" . $password . "' WHERE email='" . $email . "'";
+        if ($conn->query($sql)) {
+            echo "1";
+        } else {
+            echo "0";
+        }
+    }
+
+
+});
+
+function getDiplomasByTags($conn, $extendedFilter) {
+    if(sizeof($extendedFilter["tags"]) == 0) {
+        return [];
+    }
+
+    $parts = [];
+    array_push($parts,"SELECT * FROM diploma
+            WHERE id IN (
+              SELECT d.id FROM diploma d
+              JOIN diploma_has_tags dt ON d.id = dt.diploma_id
+              WHERE ");
+
+    foreach($extendedFilter["tags"] as $key => $tag) {
+        $sql = $key == 0 ? "" : "OR ";
+        $sql .= "dt.tags_id = '" . $tag["id"] . "' ";
+        array_push($parts, $sql);
+    }
+
+    array_push($parts, "GROUP BY d.id ");
+    array_push($parts, "HAVING COUNT(d.id) = " . sizeof($extendedFilter["tags"]) . ") ");
+    if($extendedFilter["year"] !== "") {
+        array_push($parts, "AND YEAR = '" . $extendedFilter["year"] . "' ");
+    }
+    array_push($parts, "ORDER BY id DESC");
+    $sql = implode("", $parts);
+    $sth = $conn->query($sql);
+    $result = $sth->fetchAll();
+    return readDiplomas($conn, $result);
+}
+
+function readDiplomas($conn, $result)
+{
+    $diplomas = [];
+    foreach ($result as $row) {
         $diploma_id = $row["id"];
         $diploma_titel = $row["title"];
         $diploma_summary = $row["summary"];
@@ -145,7 +466,7 @@ Flight::route('GET /diplomarbeiten', function () {
             }
         }
 
-        $diploma[] = array('id' => $diploma_id, 'title' => $diploma_titel, 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => $diploma_year, 'upload' => $diplomathesis, 'summary' => $diploma_summary, 'notes' => $diploma_notes, 'attachments' => $attachments, 'tags' => $tags);
+        $diplomas[] = array('id' => $diploma_id, 'title' => $diploma_titel, 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => $diploma_year, 'upload' => $diplomathesis, 'summary' => $diploma_summary, 'notes' => $diploma_notes, 'attachments' => $attachments, 'tags' => $tags);
 
         unset($tags);
         unset($authors);
@@ -154,503 +475,8 @@ Flight::route('GET /diplomarbeiten', function () {
         unset($diplomathesis);
         unset($attachments);
     }
-
-    if ($vorhanden) {
-        echo json_encode($diploma);
-
-    } else {
-        $diploma[] = array('id' => "", 'title' => "Keine Diplomarbeit gefunden", 'authors' => "", 'tutors' => "", 'departments' => "", 'year' => "", 'upload' => "", 'summary' => "", 'notes' => "", 'attachments' => "", 'tags' => "");
-        echo json_encode($diploma);
-    }
-});
-
-/*Flight::route('GET /users', function () {
-    $users[] = array('id' => "2", 'email' => 'stefan', 'password' => 'stefan');
-    $users[] = array('id' => "1", 'email' => 'markus', 'password' => 'markus');
-    $users[] = array('id' => "3", 'email' => 'sebi', 'password' => 'sebi');
-    $users[] = array('id' => "4", 'email' => 'karl', 'password' => 'karl');
-    echo json_encode($users);
-});*/
-
-/**
- * Get list of authors.
- */
-Flight::route('GET /authors', function () {
-
-    $authors = [];
-    $conn = Flight::db();
-    $sql = "SELECT * FROM authors";
-    $sth = $conn->query($sql);
-    $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
-    foreach ($result as $row) {
-        $id = $row['id'];
-        $firstname = $row['firstname'];
-        $lastname = $row['lastname'];
-        $authors[] = array('id' => $id, 'firstname' => $firstname, 'lastname' => $lastname);
-    }
-    echo json_encode($authors);
-});
-
-/**
- * Get list of tutors.
- */
-Flight::route('GET /tutors', function () {
-
-    $tutors = [];
-    $conn = Flight::db();
-    $sql = "SELECT * FROM tutors";
-    $sth = $conn->query($sql);
-    $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
-    foreach ($result as $row) {
-        $id = $row['id'];
-        $firstname = $row['firstname'];
-        $lastname = $row['lastname'];
-        $tutors[] = array('id' => $id, 'firstname' => $firstname, 'lastname' => $lastname);
-    }
-    echo json_encode($tutors);
-});
-
-/**
- * Get list of departments.
- */
-Flight::route('GET /departments', function () {
-
-    $departments = [];
-    $conn = Flight::db();
-    $sql = "SELECT * FROM deparments";
-    $sth = $conn->query($sql);
-    $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
-    foreach ($result as $row) {
-        $id = $row['id'];
-        $name = $row['name'];
-        $departments[] = array('id' => $id, 'name' => $name);
-    }
-    echo json_encode($departments);
-});
-
-/**
- * Get list of tags.
- */
-Flight::route('GET /tags', function () {
-
-    $tags = [];
-    $conn = Flight::db();
-    $sql = "SELECT * FROM tags";
-    $sth = $conn->query($sql);
-    $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
-    foreach ($result as $row) {
-        $id = $row['id'];
-        $name = $row['name'];
-        $tags[] = array('id' => $id, 'name' => $name);
-    }
-    echo json_encode($tags);
-});
-
-/*Flight::route('GET /diplomarbeiten/@id', function ($id) {
-    $arr1 = array('id' => $id, 'title' => "title1", 'author' => "author1", 'tutor' => "tutor1", 'departments' => "department1", 'year' => "jahr1", 'upload' => "diplomathesispdf1", 'summary' => "summary1", 'attachments' => "attachments1", 'tags' => "tags1");
-    echo json_encode($arr1);
-});*/
-
-/**
- * Delete diploma
- */
-Flight::route('DELETE /diplomarbeiten/@id', function ($id) {
-    $conn = Flight::db();
-
-    // Delete all relations of the diploma
-    $sql = "DELETE FROM attachments_has_diploma WHERE diploma_id ='$id'";
-    $conn->query($sql);
-    $sql = "DELETE FROM authors_has_diploma WHERE diploma_id ='$id'";
-    $conn->query($sql);
-    $sql = "DELETE FROM diploma_has_deparments WHERE diploma_id = '$id'";
-    $conn->query($sql);
-    $sql = "DELETE FROM diploma_has_tags WHERE diploma_id = '$id'";
-    $conn->query($sql);
-    $sql = "DELETE FROM tutors_has_diploma WHERE diploma_id = '$id'";
-    $conn->query($sql);
-
-    // Delete attachments from upload folder
-    $sql = "SELECT * from attachments WHERE diploma_id = '$id'";
-    $stmt = $conn->query($sql);
-    $result = $stmt->fetchAll();
-    foreach($result as $attachment) {
-        $file = realpath("../uploads/" . $attachment['name']);
-        if(is_file($file)) {
-            unlink($file);
-        }
-    }
-
-    // Delete attachments
-    $sql = "DELETE from attachments WHERE diploma_id = '$id'";
-    $conn->query($sql);
-
-    // Delete diploma file from upload folder
-    $sql = "SELECT * FROM diploma WHERE id = '$id'";
-    $stmt = $conn->query($sql);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    $file = realpath("../uploads/" . $result["diplomathesis"]);
-    if(is_file($file)) {
-        unlink($file);
-    }
-
-    // Delete diploma
-    $sql = "DELETE FROM diploma WHERE id = '$id'";
-    $conn->query($sql);
-});
-
-/**
- * Save diploma (create and update)
- */
-Flight::route('POST /diplomarbeiten', function () {
-
-    // Connect to database
-    $conn = Flight::db();
-
-    // Convert JSON object into diploma array
-    $diploma = json_decode($_POST["diploma"], true);
-
-    // Save uploaded diploma file
-    saveDiplomaFile($diploma);
-    saveAttachmentsFiles($diploma);
-
-    // Save diploma in database
-    // FIXME Transaktionsklammer!!!!
-    try {
-        $conn->beginTransaction();
-        saveDiploma($conn, $diploma);
-        saveAttachments($conn, $diploma);
-        saveAuthors($conn, $diploma);
-        saveTutors($conn, $diploma);
-        saveDepartments($conn, $diploma);
-        saveTags($conn, $diploma);
-        $conn->commit();
-    } catch (Exception $e) {
-        $conn->rollback();
-        die("Fehler beim Speichern der Diplomarbeit:" . $e);
-    }
-
-    // Convert diploma array into JSON object
-    echo json_encode($diploma);
-});
-
-Flight::route('POST /login', function () {
-
-
-    $conn = Flight::db();
-
-    $json = file_get_contents("php://input");
-    $users = json_decode($json, true);
-
-    $password = hash("sha512", $users["password"]);
-    $email = $users["email"];
-
-
-    $sql = "SELECT * FROM users WHERE email ='" . $email . "' AND password ='" . $password . "'"; //SQL Statement zum suchen aller Einträge die mit der eingegebenen email übereinstimmen
-    $res = $conn->query($sql);
-    if ($res->fetchColumn() > 0) { // Wenn Die Anzahl der rows größer als 0 ist, gibt es ein Eintrag in der DB und somit login :)
-        // Session Variable login wird auf 1 gesetzt wenn user erfolgreich eingeloggt sonst ist sie 0
-        echo("1");
-        $_SESSION["logged"] = 1;
-    } else {
-        echo("0");
-
-    }
-
-});
-
-Flight::route('GET /logout', function () {
-    $_SESSION["logged"] = 0;
-    echo(0); // 0 = false also ausgeloggt, 1 = true eingeloggt
-    session_unset();
-    session_destroy();
-});
-
-Flight::route('POST /register', function () {
-    $conn = Flight::db();
-    $json = file_get_contents("php://input");
-    $users = json_decode($json, true);
-    $email = $users["email"];
-    $password = $users["password"];
-    $password = hash("sha512", $users["password"]);
-    $sql = "SELECT * FROM users WHERE email = '" . $email . "'";
-    $res = $conn->query($sql); // Führer SQL Statement aus und speicher ergebnis ( Objekt falls vorhanden in $res )
-    if ($res->fetchColumn() > 0) { //Falls Eintrag vorhanden dann wird email bereits verwendet
-        echo "0";
-    } else {
-        $insert = "INSERT INTO users( email, password) VALUES ('" . $email . "','" . $password . "')";
-        if ($conn->query($insert) == true) {
-            echo "1";
-        } else {
-            echo "0";
-        }
-
-    }
-
-});
-
-Flight::route('POST /extendedFilter', function () {
-    $json = file_get_contents("php://input");
-    $extendedFilter = json_decode($json, true);
-
-
-    $sql = "SELECT * FROM diploma d";
-    $vals = []; //Array deklarieren
-
-    array_push($vals, $sql);
-    $dep = $extendedFilter["departments"][0];
-    $tag = $extendedFilter["tags"][0];
-    $auth = $extendedFilter["authors"][0];
-    $tuth = $extendedFilter["tutors"][0];
-
-
-    if (!(empty($dep))) {
-
-        $sql = " JOIN diploma_has_deparments dp ON d.id = dp.diploma_id AND ( ";
-        array_push($vals, $sql);
-
-        for ($i = 0; $i < count($dep); $i++) {
-            $dep_id = $dep[$i]["id"];
-            $sql = $i == 0 ? " " : " OR ";
-            $sql .= " dp.deparments_id = '$dep_id' ";
-            array_push($vals, $sql);
-
-        }
-        array_push($vals, ")");
-    }
-
-    if (!(empty($tag))) {
-        $sql = " JOIN diploma_has_tags dt ON d.id = dt.diploma_id AND ( ";
-        array_push($vals, $sql);
-        for ($i = 0; $i < count($tag); $i++) {
-            $tag_id = $tag[$i]["id"];
-            $sql = $i == 0 ? " " : " OR ";
-            $sql .= " dt.tags_id = '$tag_id' ";
-            array_push($vals, $sql);
-
-        }
-
-        array_push($vals, ")");
-    }
-
-    if (!(empty($auth))) {
-        $sql = " JOIN authors_has_diploma ad ON d.id = ad.diploma_id AND ( ";
-        array_push($vals, $sql);
-        for ($i = 0; $i < count($auth); $i++) {
-            $auth_id = $auth[$i]["id"];
-            $sql = $i == 0 ? " " : " OR ";
-            $sql .= "  ad.authors_id = '$auth_id' ";
-            array_push($vals, $sql);
-
-        }
-        array_push($vals, ")");
-    }
-
-    if (!(empty($tuth))) {
-        $sql = " JOIN tutors_has_diploma td ON d.id = td.diploma_id AND ( ";
-        array_push($vals, $sql);
-        for ($i = 0; $i < count($tuth); $i++) {
-            $tuth_id = $tuth[$i]["id"];
-            $sql = $i == 0 ? " " : " OR ";
-            $sql .= " td.tutors_id = '$tuth_id' ";
-            array_push($vals, $sql);
-
-        }
-        array_push($vals, ")");
-    }
-
-    if (!(empty($extendedFilter["year"]))) {
-        $year = $extendedFilter["year"];
-        $sql = " WHERE d.year = '$year'";
-        array_push($vals, $sql);
-    }
-
-
-    $sql = implode("", $vals); //Verbindet ein Array zu einem String
-
-    echo $sql;
-
-
-    // echo(json_encode($extendedFilter));
-
-});
-
-Flight::route('POST /search', function () {
-    $conn = Flight::db();
-    $json = file_get_contents("php://input");
-    $search = json_decode($json, true);
-    $title_s = $search["name"];
-    $tags = [];
-    $authors = [];
-    $tutors = [];
-    $departments = [];
-    $attachments = [];
-
-    $sql = "SELECT * FROM diploma WHERE title LIKE '%$title_s%'";
-    $sth = $conn->query($sql);
-    $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
-
-
-    $vorhanden = false;
-
-    foreach ($result as $row) {
-
-        $vorhanden = true;
-        $diploma_id = $row["id"];
-        $diploma_titel = $row["title"];
-        $diploma_summary = $row["summary"];
-        $diploma_notes = $row["notes"];
-        $diploma_year = $row["year"];
-        $diploma_org_name = $row["org_name"];
-        //hier Fehlt Diplomathesis Datei und attachments
-
-        $diploma_file = $row["diplomathesis"];
-        $diploma_pfad = "uploads/$diploma_file";
-
-        $diplomathesis[] = array('id' => $diploma_id, 'name' => $diploma_org_name, "tmp_name" => $diploma_pfad);
-
-        $sql_2 = "SELECT * FROM authors_has_diploma WHERE diploma_id = '$diploma_id'";
-        $sth_2 = $conn->query($sql_2);
-        $res_2 = $sth_2->fetchAll();
-
-        foreach ($res_2 as $row) {
-
-            $author_id = $row["authors_id"];
-            $sql_3 = "SELECT * FROM authors WHERE id = '$author_id'";
-            $sth_3 = $conn->query($sql_3);
-            $res_3 = $sth_3->fetchAll();
-
-
-            foreach ($res_3 as $row) {
-                $ath_id = $row["id"];
-                $ath_firstname = $row["firstname"];
-                $ath_lastname = $row["lastname"];
-
-                $authors[] = array('id' => $ath_id, 'firstname' => $ath_firstname, 'lastname' => $ath_lastname);
-
-            }
-        }
-        $sql_4 = "SELECT * FROM tutors_has_diploma WHERE diploma_id = '$diploma_id'";
-        $sth_4 = $conn->query($sql_4);
-        $res_4 = $sth_4->fetchAll();
-
-        foreach ($res_4 as $row) {
-
-            $tutor_id = $row["tutors_id"];
-            $sql_5 = "SELECT * FROM tutors WHERE id = '$tutor_id'";
-            $sth_5 = $conn->query($sql_5);
-            $res_5 = $sth_5->fetchAll();
-
-            foreach ($res_5 as $row) {
-
-                $tut_id = $row["id"];
-                $tut_firstname = $row["firstname"];
-                $tut_lastname = $row["lastname"];
-
-                $tutors[] = array('id' => $tut_id, 'firstname' => $tut_firstname, 'lastname' => $tut_lastname);
-            }
-        }
-
-        $sql_6 = "SELECT * FROM diploma_has_tags WHERE diploma_id = '$diploma_id'";
-        $sth_6 = $conn->query($sql_6);
-        $res_6 = $sth_6->fetchAll();
-
-        foreach ($res_6 as $row) {
-
-            $tag_id = $row["tags_id"];
-            $sql_7 = "SELECT * FROM tags WHERE id = '$tag_id'";
-            $sth_7 = $conn->query($sql_7);
-            $res_7 = $sth_7->fetchAll();
-
-            foreach ($res_7 as $row) {
-
-                $t_id = $row["id"];
-                $t_name = $row["name"];
-                $tags[] = array('id' => $t_id, 'name' => $t_name);
-            }
-
-        }
-
-        $sql_8 = "SELECT * FROM diploma_has_deparments WHERE diploma_id = '$diploma_id'";
-        $sth_8 = $conn->query($sql_8);
-        $res_8 = $sth_8->fetchAll();
-
-        foreach ($res_8 as $row) {
-
-            $dep_id = $row["deparments_id"];
-            $sql_9 = "SELECT * FROM deparments WHERE id = '$dep_id'";
-            $sth_9 = $conn->query($sql_9);
-            $res_9 = $sth_9->fetchAll();
-
-            foreach ($res_9 as $row) {
-
-                $d_id = $row["id"];
-                $d_name = $row["name"];
-                $departments[] = array('id' => $d_id, 'name' => $d_name);
-            }
-        }
-        $sql_10 = "SELECT * FROM attachments_has_diploma WHERE diploma_id ='$diploma_id'";
-        $sth_10 = $conn->query($sql_10);
-        $res_10 = $sth_10->fetchAll();
-
-        /*** Anfang - Geändert von Markus ***
-         * //wird leeres array zurückgegeben
-         * $attachments[] = array('id' => null, 'name' => null, "tmp_name" => null); //Falls es keine attachments gibt
-         *** Ende - Geändert von Markus ***/
-
-        foreach ($res_10 as $row) {
-
-            $attachments_id = $row["attachments_id"];
-            $sql_11 = "SELECT * FROM attachments WHERE id = '$attachments_id'";
-            $sth_11 = $conn->query($sql_11);
-            $res_11 = $sth_11->fetchAll();
-
-            foreach ($res_11 as $row) {
-
-                $a_id = $row["id"];
-                $a_name = $row["name"];
-                $org_name = $row["org_name"];
-                $attachments[] = array('id' => $a_id, 'name' => $org_name, "tmp_name" => "uploads/$a_name");
-            }
-        }
-        $diploma[] = array('id' => $diploma_id, 'title' => $diploma_titel, 'authors' => $authors, 'tutors' => $tutors, 'departments' => $departments, 'year' => $diploma_year, 'upload' => $diplomathesis, 'summary' => $diploma_summary, 'notes' => $diploma_notes, 'attachments' => $attachments, 'tags' => $tags);
-    }
-
-    if ($vorhanden) {
-        echo json_encode($diploma);
-    } else {
-
-        $diploma[] = array('id' => "", 'title' => "Keine Diplomarbeit gefunden", 'authors' => "", 'tutors' => "", 'departments' => "", 'year' => "", 'upload' => "", 'summary' => "", 'notes' => "", 'attachments' => "", 'tags' => "");
-        echo json_encode($diploma);
-    }
-
-
-});
-
-Flight::route('POST /resetpassword', function () {
-
-    $conn = Flight::db();
-    $json = file_get_contents("php://input");
-    $reset = json_decode($json, true);
-
-    $from = "diplomarbeitsarchiv@htl-donaustadt.at";
-    $email = $reset["email"];
-    $sql = "SELECT * FROM users WHERE email = '$email'";
-    $res = $conn->query($sql);
-    if ($res->fetchColumn() > 0) {
-        $password = substr(md5(uniqid(rand(), 1)), 3, 10); // Geniere ein neues 10 Zeichen langes Passwort
-        echo $password;
-        $password = hash("sha512", $password);
-        mail($email, "Passwort Reset", "Ihr neues Passwort lautet : " . $password, $from); // Problem hier, mails kommen nicht an
-        $sql = "UPDATE users SET password ='" . $password . "' WHERE email='" . $email . "'";
-        if ($conn->query($sql)) {
-            echo "1";
-        } else {
-            echo "0";
-        }
-    }
-
-
-});
+    return $diplomas;
+}
 
 function saveDiploma($conn, &$diploma)
 {
@@ -891,7 +717,6 @@ function saveAttachmentsFiles(&$diploma)
         }
     }
 }
-
 
 Flight::start();
 ?>

@@ -229,26 +229,33 @@
                     "year": "",
                     "tags": []
                 };
-                this.searchedDiploma.authors.push(this.searchedAuthors);
-                this.searchedDiploma.tutors.push(this.searchedTutors);
-                this.searchedDiploma.departments.push(this.searchedDepartments);
-                this.searchedDiploma.tags.push(this.searchedTags);
+                this.searchedDiploma.authors = this.searchedAuthors;
+                this.searchedDiploma.tutors = this.searchedTutors;
+                this.searchedDiploma.departments = this.searchedDepartments;
+                this.searchedDiploma.tags = this.searchedTags;
                 this.searchedDiploma.year = this.searchedYear;
                 axios.post('/diplomarbeitsarchiv/api/extendedFilter', this.searchedDiploma)
                     .then(response => {
-                        console.log(this.searchedDiploma)
-                        console.log(response)
+                        console.log(response.data);
+                        this.diplomaList = response.data;
                     })
                     .catch(error => {
                         console.log(error)
                     })
             },
             onResetExtendedFilter() {
-                this.searchedAuthors = null,
-                    this.searchedTutors = null,
-                    this.searchedDepartments = null,
-                    this.searchedTags = null,
-                    this.searchedYear = ""
+                this.searchedAuthors = null;
+                this.searchedTutors = null;
+                this.searchedDepartments = null;
+                this.searchedTags = null;
+                this.searchedYear = "";
+                axios.get('/diplomarbeitsarchiv/api/diplomarbeiten')
+                    .then(response => {
+                        this.diplomaList = response.data;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             },
             onCreateDiploma(diploma) {
                 // Add to list
@@ -267,7 +274,6 @@
             // Get initial list of diplomas
             axios.get('/diplomarbeitsarchiv/api/diplomarbeiten')
                 .then(response => {
-                    console.log(response.data)
                     this.diplomaList = response.data;
                 })
                 .catch(function (error) {

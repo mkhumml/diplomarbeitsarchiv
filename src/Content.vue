@@ -83,20 +83,24 @@
             },
             showDepartments(departments) {
                 let display = "";
-                for (let i = 0; i < departments.length; i++) {
-                    display += departments[i].name;
-                    if (i < (departments.length - 1)) {
-                        display += ", "
+                if(departments) {
+                    for (let i = 0; i < departments.length; i++) {
+                        display += departments[i].name;
+                        if (i < (departments.length - 1)) {
+                            display += ", "
+                        }
                     }
                 }
-                return display
+                return display;
             },
             showTutors(tutors) {
                 let display = "";
-                for (let i = 0; i < tutors.length; i++) {
-                    display += tutors[i].firstname + " " + tutors[i].lastname + " "
-                    if (i < (tutors.length - 1)) {
-                        display += " , "
+                if(tutors) {
+                    for (let i = 0; i < tutors.length; i++) {
+                        display += tutors[i].firstname + " " + tutors[i].lastname + " "
+                        if (i < (tutors.length - 1)) {
+                            display += " , "
+                        }
                     }
                 }
                 return display
