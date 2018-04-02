@@ -18,9 +18,6 @@ Flight::route('GET /diplomarbeiten', function () {
     $sth = $conn->query($sql);
     $result = $sth->fetchAll();
     $diplomas = readDiplomas($conn, $result);
-    if (sizeof($diplomas) == 0) {
-        $diplomas[] = array('id' => "", 'title' => "Keine Diplomarbeit gefunden", 'authors' => "", 'tutors' => "", 'departments' => "", 'year' => "", 'upload' => "", 'summary' => "", 'notes' => "", 'attachments' => "", 'tags' => "");
-    }
     echo json_encode($diplomas);
 });
 
@@ -116,46 +113,52 @@ Flight::route('GET /tags', function () {
  */
 Flight::route('DELETE /diplomarbeiten/@id', function ($id) {
     $conn = Flight::db();
+    try {
+        $conn->beginTransaction();
+        // Delete all relations of the diploma
+        $sql = "DELETE FROM attachments_has_diploma WHERE diploma_id ='$id'";
+        $conn->query($sql);
+        $sql = "DELETE FROM authors_has_diploma WHERE diploma_id ='$id'";
+        $conn->query($sql);
+        $sql = "DELETE FROM diploma_has_deparments WHERE diploma_id = '$id'";
+        $conn->query($sql);
+        $sql = "DELETE FROM diploma_has_tags WHERE diploma_id = '$id'";
+        $conn->query($sql);
+        $sql = "DELETE FROM tutors_has_diploma WHERE diploma_id = '$id'";
+        $conn->query($sql);
 
-    // Delete all relations of the diploma
-    $sql = "DELETE FROM attachments_has_diploma WHERE diploma_id ='$id'";
-    $conn->query($sql);
-    $sql = "DELETE FROM authors_has_diploma WHERE diploma_id ='$id'";
-    $conn->query($sql);
-    $sql = "DELETE FROM diploma_has_deparments WHERE diploma_id = '$id'";
-    $conn->query($sql);
-    $sql = "DELETE FROM diploma_has_tags WHERE diploma_id = '$id'";
-    $conn->query($sql);
-    $sql = "DELETE FROM tutors_has_diploma WHERE diploma_id = '$id'";
-    $conn->query($sql);
+        // Delete attachments from upload folder
+        $sql = "SELECT * from attachments WHERE diploma_id = '$id'";
+        $stmt = $conn->query($sql);
+        $result = $stmt->fetchAll();
+        foreach ($result as $attachment) {
+            $file = realpath("../uploads/" . $attachment['name']);
+            if (is_file($file)) {
+                unlink($file);
+            }
+        }
 
-    // Delete attachments from upload folder
-    $sql = "SELECT * from attachments WHERE diploma_id = '$id'";
-    $stmt = $conn->query($sql);
-    $result = $stmt->fetchAll();
-    foreach ($result as $attachment) {
-        $file = realpath("../uploads/" . $attachment['name']);
+        // Delete attachments
+        $sql = "DELETE from attachments WHERE diploma_id = '$id'";
+        $conn->query($sql);
+
+        // Delete diploma file from upload folder
+        $sql = "SELECT * FROM diploma WHERE id = '$id'";
+        $stmt = $conn->query($sql);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $file = realpath("../uploads/" . $result["diplomathesis"]);
         if (is_file($file)) {
             unlink($file);
         }
+
+        // Delete diploma
+        $sql = "DELETE FROM diploma WHERE id = '$id'";
+        $conn->query($sql);
+        $conn->commit();
+    } catch (Exception $e) {
+        $conn->rollback();
+        die("Fehler beim Speichern der Diplomarbeit:" . $e);
     }
-
-    // Delete attachments
-    $sql = "DELETE from attachments WHERE diploma_id = '$id'";
-    $conn->query($sql);
-
-    // Delete diploma file from upload folder
-    $sql = "SELECT * FROM diploma WHERE id = '$id'";
-    $stmt = $conn->query($sql);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    $file = realpath("../uploads/" . $result["diplomathesis"]);
-    if (is_file($file)) {
-        unlink($file);
-    }
-
-    // Delete diploma
-    $sql = "DELETE FROM diploma WHERE id = '$id'";
-    $conn->query($sql);
 });
 
 /**
@@ -174,7 +177,6 @@ Flight::route('POST /diplomarbeiten', function () {
     saveAttachmentsFiles($diploma);
 
     // Save diploma in database
-    // FIXME Transaktionsklammer!!!!
     try {
         $conn->beginTransaction();
         saveDiploma($conn, $diploma);
@@ -200,22 +202,22 @@ Flight::route('POST /login', function () {
 
     $json = file_get_contents("php://input");
     $users = json_decode($json, true);
-
-    $password = hash("sha512", $users["password"]);
-    $email = $users["email"];
-
-
-    $sql = "SELECT * FROM users WHERE email ='" . $email . "' AND password ='" . $password . "'"; //SQL Statement zum suchen aller Einträge die mit der eingegebenen email übereinstimmen
-    $res = $conn->query($sql);
-    if ($res->fetchColumn() > 0) { // Wenn Die Anzahl der rows größer als 0 ist, gibt es ein Eintrag in der DB und somit login :)
-        // Session Variable login wird auf 1 gesetzt wenn user erfolgreich eingeloggt sonst ist sie 0
-        echo("1");
-        $_SESSION["logged"] = 1;
+    if ($users["email"] == "logout") {
+        setcookie("user", "", time() - 3600, "/");
+        echo(0);
     } else {
-        echo("0");
-
+        $password = hash("sha512", $users["password"]);
+        $email = $users["email"];
+        $sql = "SELECT * FROM users WHERE email ='" . $email . "' AND password ='" . $password . "'"; //SQL Statement zum suchen aller Einträge die mit der eingegebenen email übereinstimmen
+        $res = $conn->query($sql);
+        if ($res->fetchColumn() > 0) { // Wenn Die Anzahl der rows größer als 0 ist, gibt es ein Eintrag in der DB und somit login :)
+            //setcookie("user", $email, time() + (86400 * 30), "/");
+            $_SESSION["logged"] = 1;
+            echo(1);
+        } else {
+            echo(0);
+        }
     }
-
 });
 
 Flight::route('GET /logout', function () {
@@ -258,13 +260,13 @@ Flight::route('POST /extendedFilter', function () {
 
     $conn = Flight::db();
 
-    // TODO Other filters (combine only items which are in BOTH results)
-    $diplomasByTags = getDiplomasByTags($conn, $extendedFilter);
+    /*    $sql = createExtendedFilterQuery($extendedFilter);
+        $sth = $conn->query($sql);
+        $result = $sth->fetchAll();
+        $diplomas = readDiplomas($conn, $result);
+        echo json_encode($diplomas);*/
 
-    if (sizeof($diplomasByTags) == 0) {
-        $diplomas[] = array('id' => "", 'title' => "Keine Diplomarbeit gefunden", 'authors' => "", 'tutors' => "", 'departments' => "", 'year' => "", 'upload' => "", 'summary' => "", 'notes' => "", 'attachments' => "", 'tags' => "");
-    }
-    echo json_encode($diplomasByTags);
+    echo json_encode(getDiplomasByTags($conn, $extendedFilter));
 });
 
 Flight::route('POST /search', function () {
@@ -278,9 +280,6 @@ Flight::route('POST /search', function () {
     $sth = $conn->query($sql);
     $result = $sth->fetchAll(); // Gibt alle Einträge von der DB als Array zurück
     $diplomas = readDiplomas($conn, $result);
-    if (sizeof($diplomas) == 0) {
-        $diplomas[] = array('id' => "", 'title' => "Keine Diplomarbeit gefunden", 'authors' => "", 'tutors' => "", 'departments' => "", 'year' => "", 'upload' => "", 'summary' => "", 'notes' => "", 'attachments' => "", 'tags' => "");
-    }
     echo json_encode($diplomas);
 });
 
@@ -310,19 +309,88 @@ Flight::route('POST /resetpassword', function () {
 
 });
 
-function getDiplomasByTags($conn, $extendedFilter) {
-    if(sizeof($extendedFilter["tags"]) == 0) {
+function createExtendedFilterQuery($extendedFilter)
+{
+
+    $sql = "SELECT * FROM diploma ";
+    $subQueries = createExtendedFilterSubQueries($extendedFilter);
+    if ($subQueries != null) {
+        $sql .= "WHERE id IN( " . $subQueries . " )";
+    }
+
+    if (array_key_exists("year", $extendedFilter)) {
+        if ($subQueries != null) {
+            $sql .= " AND ";
+        } else {
+            $sql .= " WHERE ";
+        }
+        $sql .= "year = '" . $extendedFilter["year"] . "' ";
+    }
+
+    $sql .= "ORDER BY id DESC";
+    return $sql;
+}
+
+function createExtendedFilterSubQueries($extendedFilter)
+{
+
+    $filters = null;
+    if (sizeof($extendedFilter["authors"]) > 0) {
+        $filters[] = array("key" => "authors", "table" => "authors_has_diploma", "id" => "authors_id");
+    }
+    if (sizeof($extendedFilter["tutors"]) > 0) {
+        $filters[] = array("key" => "tutors", "table" => "tutors_has_diploma", "id" => "tutors_id");
+    }
+    if (sizeof($extendedFilter["departments"]) > 0) {
+        $filters[] = array("key" => "departments", "table" => "diploma_has_deparments", "id" => "deparments_id");
+    }
+    if (sizeof($extendedFilter["tags"]) > 0) {
+        $filters[] = array("key" => "tags", "table" => "diploma_has_tags", "id" => "tags_id");
+    }
+
+    if ($filters != null) {
+        return createExtendedFilterSubQuery($filters, $extendedFilter);
+    } else {
+        return null;
+    }
+}
+
+function createExtendedFilterSubQuery(&$filters, $extendedFilter)
+{
+
+    // Get and remove first filter entry for recursion
+    $filter = array_shift($filters);
+    $sql = "SELECT id FROM ";
+    if ($filters != null) {
+        $sql .= "( " . createExtendedFilterSubQuery($filters, $extendedFilter) . " ) d ";
+    } else {
+        $sql .= "diploma d ";
+    }
+    $sql .= "JOIN " . $filter["table"] . " ref ON d.id = ref." . $filter["id"] . " ";
+    $sql .= "WHERE ";
+    foreach ($extendedFilter[$filter["key"]] as $key => $val) {
+        $sql .= $key == 0 ? "" : " OR ";
+        $sql .= "ref." . $filter["id"] . " = '" . $val["id"] . "' ";
+    }
+    $sql .= "GROUP BY id HAVING COUNT(d.id) = " . sizeof($extendedFilter[$filter["key"]]);
+    return $sql;
+}
+
+
+function getDiplomasByTags($conn, $extendedFilter)
+{
+    if (sizeof($extendedFilter["tags"]) == 0) {
         return [];
     }
 
     $parts = [];
-    array_push($parts,"SELECT * FROM diploma
+    array_push($parts, "SELECT * FROM diploma
             WHERE id IN (
               SELECT d.id FROM diploma d
               JOIN diploma_has_tags dt ON d.id = dt.diploma_id
               WHERE ");
 
-    foreach($extendedFilter["tags"] as $key => $tag) {
+    foreach ($extendedFilter["tags"] as $key => $tag) {
         $sql = $key == 0 ? "" : "OR ";
         $sql .= "dt.tags_id = '" . $tag["id"] . "' ";
         array_push($parts, $sql);
@@ -330,7 +398,7 @@ function getDiplomasByTags($conn, $extendedFilter) {
 
     array_push($parts, "GROUP BY d.id ");
     array_push($parts, "HAVING COUNT(d.id) = " . sizeof($extendedFilter["tags"]) . ") ");
-    if($extendedFilter["year"] !== "") {
+    if ($extendedFilter["year"] !== "") {
         array_push($parts, "AND YEAR = '" . $extendedFilter["year"] . "' ");
     }
     array_push($parts, "ORDER BY id DESC");
@@ -339,6 +407,7 @@ function getDiplomasByTags($conn, $extendedFilter) {
     $result = $sth->fetchAll();
     return readDiplomas($conn, $result);
 }
+
 
 function readDiplomas($conn, $result)
 {

@@ -22,7 +22,7 @@
         },
         data() {
             return {
-                title: 'Njnja App'
+                title: 'App'
             }
         },
         methods: {

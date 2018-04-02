@@ -60,6 +60,9 @@ span.icon-chevron-down, span.icon-chevron-up, span.icon-home {
   h3 {
     border-bottom: 1px solid @color-primary-blue;
   }
+  p {
+    line-height: 1.2em;
+  }
 }
 
 .details {
@@ -89,10 +92,11 @@ span.icon-chevron-down, span.icon-chevron-up, span.icon-home {
   padding-top: 0.5rem;
 }
 
+.required {
+  color: @color-red;
+}
+
 .searching {
-  button:last-child {
-    margin-left: 1rem;
-  }
   &.flz-form &input {
     height: auto;
   }
@@ -112,6 +116,11 @@ span.icon-chevron-down, span.icon-chevron-up, span.icon-home {
 
   .icon-file-text-o[class^="icon-"], [class*=" icon-"] {
     padding-left: 0;
+  }
+}
+@media @flz-media-lte-m {
+  .searching button:last-child {
+    margin-left: 0;
   }
 }
 

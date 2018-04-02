@@ -1,17 +1,12 @@
 import Vue from 'vue'
 import App from './App.vue'
-import VueClip from 'vue-clip'
 import Multiselect from 'vue-multiselect'
 
+//adding multiselect component global
 Vue.component('multiselect', Multiselect)
-Vue.use(VueClip)
 
-
+//init new vue instance
 new Vue({
     el: '#app',
     render: h => h(App)
 })
-/*
-* v-bind: dynamic output
-*
-* */

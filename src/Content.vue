@@ -1,5 +1,10 @@
 <template>
     <div class="flz-box flz-nospacer">
+        <!--
+        compact display of diploma data
+        shows title, departments, year, tutors
+        icon toggle for more information (collapsed)
+        -->
         <div class="flz-box flz-nospacer">
             <div class="flz-box flz-5 flz-10-lte-m">
                 <div class="icon-file-text-o"></div>
@@ -17,6 +22,10 @@
                 </p>
             </div>
         </div>
+        <!--
+        display of the summary and notes, only if collapsed
+        possibility to view details (button) when loggedIn = true
+        -->
         <div v-show="collapsed" class="flz-box flz-100">
             <div class="flz-box flz-5 flz-10-lte-m flz-nospacer-gte-m">
                 <p></p>
@@ -43,6 +52,10 @@
                 <p></p>
             </div>
         </div>
+        <!--
+        tags get displayed with an icon
+        div/p tags for framework spacers
+        -->
         <div class="flz-box flz-nospacer">
             <div class="flz-box flz-5 flz-10-lte-m flz-clear">
                 <p>
@@ -62,6 +75,7 @@
 
 <script>
     export default {
+        //property diploma gets declared
         props: {
             diploma: {
                 type: Object,
@@ -77,10 +91,12 @@
             }
         },
         methods: {
+            //emit event to display detail page
             onViewDiploma() {
                 console.log("select " + this.diploma);
                 this.$emit('onSelectDiploma', this.diploma);
             },
+            //function to iterate through the department list
             showDepartments(departments) {
                 let display = "";
                 if(departments) {
@@ -93,6 +109,7 @@
                 }
                 return display;
             },
+            //function to iterate through the tutor list
             showTutors(tutors) {
                 let display = "";
                 if(tutors) {

@@ -2006,6 +2006,9 @@ span.icon-home {
 .contentArticle h3 {
   border-bottom: 1px solid #005D95;
 }
+.contentArticle p {
+  line-height: 1.2em;
+}
 .details button:nth-child(even) {
   margin-left: 1rem;
 }
@@ -2027,8 +2030,8 @@ span.icon-home {
 .paddingtop {
   padding-top: 0.5rem;
 }
-.searching button:last-child {
-  margin-left: 1rem;
+.required {
+  color: #F16889;
 }
 .searching.flz-form .searchinginput {
   height: auto;
@@ -2046,6 +2049,11 @@ span.icon-home {
   .icon-file-text-o[class^="icon-"],
   [class*=" icon-"] {
     padding-left: 0;
+  }
+}
+@media (max-width: 979px) {
+  .searching button:last-child {
+    margin-left: 0;
   }
 }
 /*--------------------ID-------------------------------------*/
