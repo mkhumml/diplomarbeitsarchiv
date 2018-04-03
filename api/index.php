@@ -260,13 +260,11 @@ Flight::route('POST /extendedFilter', function () {
 
     $conn = Flight::db();
 
-    /*    $sql = createExtendedFilterQuery($extendedFilter);
-        $sth = $conn->query($sql);
-        $result = $sth->fetchAll();
-        $diplomas = readDiplomas($conn, $result);
-        echo json_encode($diplomas);*/
-
-    echo json_encode(getDiplomasByTags($conn, $extendedFilter));
+    $sql = createExtendedFilterQuery($extendedFilter);
+    $sth = $conn->query($sql);
+    $result = $sth->fetchAll();
+    $diplomas = readDiplomas($conn, $result);
+    echo json_encode($diplomas);
 });
 
 Flight::route('POST /search', function () {
@@ -311,14 +309,13 @@ Flight::route('POST /resetpassword', function () {
 
 function createExtendedFilterQuery($extendedFilter)
 {
-
     $sql = "SELECT * FROM diploma ";
     $subQueries = createExtendedFilterSubQueries($extendedFilter);
     if ($subQueries != null) {
         $sql .= "WHERE id IN( " . $subQueries . " )";
     }
 
-    if (array_key_exists("year", $extendedFilter)) {
+    if (array_key_exists("year", $extendedFilter) && $extendedFilter["year"] != "") {
         if ($subQueries != null) {
             $sql .= " AND ";
         } else {
@@ -360,13 +357,13 @@ function createExtendedFilterSubQuery(&$filters, $extendedFilter)
 
     // Get and remove first filter entry for recursion
     $filter = array_shift($filters);
-    $sql = "SELECT id FROM ";
+    $sql = "SELECT d.id FROM ";
     if ($filters != null) {
         $sql .= "( " . createExtendedFilterSubQuery($filters, $extendedFilter) . " ) d ";
     } else {
         $sql .= "diploma d ";
     }
-    $sql .= "JOIN " . $filter["table"] . " ref ON d.id = ref." . $filter["id"] . " ";
+    $sql .= "JOIN " . $filter["table"] . " ref ON d.id = ref.diploma_id ";
     $sql .= "WHERE ";
     foreach ($extendedFilter[$filter["key"]] as $key => $val) {
         $sql .= $key == 0 ? "" : " OR ";
@@ -375,39 +372,6 @@ function createExtendedFilterSubQuery(&$filters, $extendedFilter)
     $sql .= "GROUP BY id HAVING COUNT(d.id) = " . sizeof($extendedFilter[$filter["key"]]);
     return $sql;
 }
-
-
-function getDiplomasByTags($conn, $extendedFilter)
-{
-    if (sizeof($extendedFilter["tags"]) == 0) {
-        return [];
-    }
-
-    $parts = [];
-    array_push($parts, "SELECT * FROM diploma
-            WHERE id IN (
-              SELECT d.id FROM diploma d
-              JOIN diploma_has_tags dt ON d.id = dt.diploma_id
-              WHERE ");
-
-    foreach ($extendedFilter["tags"] as $key => $tag) {
-        $sql = $key == 0 ? "" : "OR ";
-        $sql .= "dt.tags_id = '" . $tag["id"] . "' ";
-        array_push($parts, $sql);
-    }
-
-    array_push($parts, "GROUP BY d.id ");
-    array_push($parts, "HAVING COUNT(d.id) = " . sizeof($extendedFilter["tags"]) . ") ");
-    if ($extendedFilter["year"] !== "") {
-        array_push($parts, "AND YEAR = '" . $extendedFilter["year"] . "' ");
-    }
-    array_push($parts, "ORDER BY id DESC");
-    $sql = implode("", $parts);
-    $sth = $conn->query($sql);
-    $result = $sth->fetchAll();
-    return readDiplomas($conn, $result);
-}
-
 
 function readDiplomas($conn, $result)
 {
